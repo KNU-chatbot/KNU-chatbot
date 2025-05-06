@@ -91,9 +91,7 @@
 </head>
 <body>
   <div class="container">
-    <!-- 로컬에 저장한 경북대 로고 -->
     <img class="logo" src="knu_logo.jpg" alt="경북대학교 로고" />
-
     <h1>⚡ 경북대학교 전기공학과 챗봇 ⚡</h1>
 
     <div id="chat-box"></div>
@@ -112,6 +110,14 @@
           <strong>챗봇:</strong> 안녕하세요! 무엇을 도와드릴까요?
         </div>`;
       chatBox.scrollTop = chatBox.scrollHeight;
+
+      // ✅ Enter 키로 메시지 전송 가능
+      const inputElem = document.getElementById("user-input");
+      inputElem.addEventListener("keydown", function (event) {
+        if (event.key === "Enter") {
+          sendMessage();
+        }
+      });
     }
 
     function sendMessage() {
@@ -121,17 +127,17 @@
 
       if (input === "") return;
 
-      // 사용자 메시지 말풍선
+      // 사용자 말풍선
       chatBox.innerHTML += `
         <div class="chat-message user">
           <strong>나:</strong> ${input}
         </div>`;
 
-      // (나중에 서버 응답 자리)
-      // chatBox.innerHTML += `
-      //   <div class="chat-message bot">
-      //     <strong>챗봇:</strong> (여기에 서버 응답)
-      //   </div>`;
+      // 임시 챗봇 응답 (백엔드 없음)
+      chatBox.innerHTML += `
+        <div class="chat-message bot">
+          <strong>챗봇:</strong> (서버 준비 중입니다)
+        </div>`;
 
       inputElem.value = "";
       chatBox.scrollTop = chatBox.scrollHeight;
@@ -139,3 +145,4 @@
   </script>
 </body>
 </html>
+
