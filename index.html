@@ -58,15 +58,15 @@
     }
 
     .chat-bubble {
+      display: inline-block;
       padding: 10px 12px;
       border-radius: 12px;
       line-height: 1.4;
       word-wrap: break-word;
       white-space: pre-wrap;
+      text-align: left;
       background-color: #f2f2f2;
       color: #111;
-      text-align: left;            /* ✅ 왼쪽 정렬 핵심 */
-      width: fit-content;          /* ✅ 텍스트 길이에 맞춰 너비 */
       max-width: 70%;
     }
 
@@ -84,6 +84,11 @@
 
     .chat-message.user .chat-bubble {
       background-color: #e1f0ff;
+    }
+
+    .bot-intro {
+      background-color: #e0e0e0 !important;
+      font-weight: bold;
     }
 
     .avatar {
@@ -147,7 +152,7 @@
       chatBox.innerHTML += `
         <div class="chat-message bot">
           <div class="avatar">🤖</div>
-          <div class="chat-bubble" style="background-color: #e0e0e0; font-weight: bold;">
+          <div class="chat-bubble bot-intro">
             ⚡ 무엇이든 물어보세요! 경북대학교 전기공학과 챗봇입니다.
           </div>
         </div>`;
@@ -226,3 +231,4 @@
   </script>
 </body>
 </html>
+
