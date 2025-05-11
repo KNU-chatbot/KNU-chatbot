@@ -67,32 +67,34 @@
     }
 
     .chat-bubble {
-      display: block;                /* ✅ 핵심: 내부 왼쪽 정렬용 */
+      display: block;
       width: fit-content;
       max-width: 70%;
-      padding: 10px 14px;            /* ✅ 여백 조정 */
-      margin: 0;                     /* ✅ 여백 초기화 */
+      padding: 10px 14px;
+      margin: 0;
       border-radius: 12px;
       line-height: 1.4;
       word-wrap: break-word;
       white-space: pre-wrap;
-      text-align: left;              /* ✅ 텍스트 왼쪽 정렬 */
+      text-align: left;
       background-color: #f2f2f2;
       color: #111;
     }
 
     .chat-message.user .chat-bubble {
+      margin-left: auto; /* ✅ 사용자 말풍선 오른쪽 정렬 */
       background-color: #e1f0ff;
     }
 
     .bot-intro {
       background-color: #e0e0e0 !important;
       font-weight: bold;
+      padding: 10px 12px !important; /* ✅ 챗봇 안내 텍스트 여백 줄임 */
     }
 
     .avatar {
       font-size: 20px;
-      margin: 0 4px 0 0;             /* ✅ 아이콘과 말풍선 간격 축소 */
+      margin: 0 4px 0 0;
       user-select: none;
     }
 
@@ -230,4 +232,3 @@
   </script>
 </body>
 </html>
-
