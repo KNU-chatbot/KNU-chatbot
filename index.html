@@ -16,9 +16,9 @@
       display: flex;
       flex-direction: column;
       height: 100%;
-      max-width: 800px;           /* ✅ 중앙 폭 제한 */
-      margin: 0 auto;             /* ✅ 중앙 정렬 */
-      padding: 0 16px;            /* ✅ 좌우 여백 */
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 16px;
       box-sizing: border-box;
     }
 
@@ -127,15 +127,14 @@
         <div class="chat-message bot" style="background-color: #e0e0e0; font-weight: bold;">
           ⚡ 무엇이든 물어보세요! 경북대학교 전기공학과 챗봇입니다.
         </div>`;
-
       chatBox.scrollTop = chatBox.scrollHeight;
 
-      // ✅ Enter / Shift+Enter 처리
+      // ✅ Shift+Enter 줄바꿈, Enter 전송
       const inputElem = document.getElementById("user-input");
       inputElem.addEventListener("keydown", function (event) {
         if (event.key === "Enter") {
           if (event.shiftKey) {
-            return; // 줄바꿈 허용
+            return;
           } else {
             event.preventDefault();
             sendMessage();
@@ -151,7 +150,7 @@
 
       if (input === "") return;
 
-      // 사용자 메시지 출력
+      // 사용자 말풍선
       chatBox.innerHTML += `
         <div class="chat-message user">
           ${input}
@@ -160,7 +159,7 @@
       chatBox.scrollTop = chatBox.scrollHeight;
 
       try {
-        // 로딩 말풍선 출력
+        // ✅ 로딩 말풍선 생성
         const loadingMessage = document.createElement("div");
         loadingMessage.className = "chat-message bot";
         loadingMessage.textContent = "...";
@@ -170,15 +169,17 @@
         // 서버 요청
         const response = await fetch("https://knu-chatbot-backend.onrender.com/ask", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json"
+          },
           body: JSON.stringify({ question: input })
         });
 
         const data = await response.json();
         const answer = data.answer;
 
-        // 로딩 말풍선 교체
-        loadingMessage.textContent = ""; 
+        // ✅ 말풍선 비우고 타이핑 시작!
+        loadingMessage.textContent = "";
         typeText(loadingMessage, answer);
 
       } catch (error) {
@@ -200,5 +201,6 @@
   </script>
 </body>
 </html>
+
 
 
