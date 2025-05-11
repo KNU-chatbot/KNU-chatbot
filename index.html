@@ -245,7 +245,7 @@
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ question: input })
-        }, 20000);
+        }, 30000);
 
         const data = await response.json();
         const answer = data.answer;
