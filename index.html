@@ -54,7 +54,7 @@
     .chat-message {
       display: flex;
       align-items: flex-start;
-      max-width: 70%;
+      max-width: 100%;
     }
 
     .chat-bubble {
@@ -65,6 +65,9 @@
       white-space: pre-wrap;
       background-color: #f2f2f2;
       color: #111;
+      text-align: left;            /* ✅ 왼쪽 정렬 핵심 */
+      width: fit-content;          /* ✅ 텍스트 길이에 맞춰 너비 */
+      max-width: 70%;
     }
 
     .bot {
@@ -81,7 +84,6 @@
 
     .chat-message.user .chat-bubble {
       background-color: #e1f0ff;
-      color: #111;
     }
 
     .avatar {
@@ -141,7 +143,7 @@
     window.onload = function () {
       const chatBox = document.getElementById("chat-box");
 
-      // 안내 메시지
+      // 고정 안내 메시지
       chatBox.innerHTML += `
         <div class="chat-message bot">
           <div class="avatar">🤖</div>
@@ -197,7 +199,7 @@
         const data = await response.json();
         const answer = data.answer;
 
-        // 응답 타이핑 애니메이션
+        // 응답 출력
         const bubble = loadingMessage.querySelector(".chat-bubble");
         bubble.textContent = "";
         typeText(bubble, answer);
@@ -224,7 +226,3 @@
   </script>
 </body>
 </html>
-
-
-
-
