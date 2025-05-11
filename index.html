@@ -176,6 +176,37 @@
       }
     }
 
+    .recommend-box {
+      position: absolute;
+      top: 120px;
+      right: -120px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .recommend-btn {
+      background-color: #f7f7f7;
+      color: #111;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      padding: 8px 12px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+      text-align: left;
+    }
+
+    .recommend-btn:hover {
+      background-color: #eee;
+    }
+
+    @media (max-width: 900px) {
+      .recommend-box {
+        display: none;
+      }
+    }
+
     textarea:disabled,
     button:disabled {
       opacity: 0.5;
@@ -189,12 +220,17 @@
       <div class="spinner"></div>
     </div>
 
+    <div class="recommend-box">
+      <button class="recommend-btn" onclick="sendRecommendedQuestion('졸업 요건이 어떻게 되나요?')">🎓 졸업 요건</button>
+      <button class="recommend-btn" onclick="sendRecommendedQuestion('교수님 이메일은 어디서 확인해요?')">📬 교수님 이메일</button>
+    </div>
+
     <header>
       <div class="header-title">
         <img src="knu_logo.jpg" alt="KNU 로고" class="logo" />
         <h1>경북대학교 전기공학과 챗봇</h1>
       </div>
-      <button id="reset-btn" title="채팅 초기화">🗑️</button>
+      <button id="reset-btn" title="초기화">🗑️</button>
     </header>
 
     <div id="chat-box"></div>
@@ -243,10 +279,10 @@
       document.getElementById("send-btn").disabled = false;
     }
 
-    async function sendMessage() {
+    async function sendMessage(customInput) {
       const inputElem = document.getElementById("user-input");
-      const input = inputElem.value.trim();
       const chatBox = document.getElementById("chat-box");
+      const input = customInput || inputElem.value.trim();
 
       if (input === "") return;
 
@@ -255,7 +291,7 @@
           <div class="avatar">🙋‍♂️</div>
           <div class="chat-bubble">${input}</div>
         </div>`;
-      inputElem.value = "";
+      if (!customInput) inputElem.value = "";
       chatBox.scrollTop = chatBox.scrollHeight;
 
       showLoading();
@@ -291,6 +327,10 @@
 
       hideLoading();
       chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function sendRecommendedQuestion(text) {
+      sendMessage(text);
     }
 
     function typeText(element, text, index = 0) {
