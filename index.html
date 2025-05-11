@@ -10,7 +10,7 @@
       height: 100%;
       width: 100%;
       font-family: "Segoe UI", "나눔고딕", sans-serif;
-      background-color: #f5f5f5;
+      background-color: #ffffff; /* 배경 흰색 */
       display: flex;
       justify-content: center;
       align-items: center;
@@ -19,9 +19,10 @@
     .container {
       width: 100%;
       height: 100%;
+      max-width: 1000px;
       display: flex;
       flex-direction: column;
-      justify-content: flex-start;
+      justify-content: space-between;
       align-items: center;
       padding: 20px;
       box-sizing: border-box;
@@ -34,7 +35,8 @@
 
     h1 {
       color: #2c3e50;
-      margin-bottom: 20px;
+      margin-bottom: 10px;
+      font-size: 24px;
     }
 
     #chat-box {
@@ -43,21 +45,24 @@
       max-width: 800px;
       border: 1px solid #ccc;
       border-radius: 8px;
-      padding: 10px;
+      padding: 15px;
       overflow-y: auto;
       background-color: #fafafa;
       text-align: left;
       margin-bottom: 15px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
     }
 
     .chat-message {
       margin-bottom: 10px;
       max-width: 80%;
-      padding: 8px 12px;
+      padding: 10px 14px;
       border-radius: 15px;
       clear: both;
       word-break: break-word;
       white-space: pre-wrap;
+      font-size: 15px;
+      line-height: 1.4;
     }
 
     .user {
@@ -72,23 +77,32 @@
       text-align: left;
     }
 
+    .input-area {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      max-width: 800px;
+      gap: 10px;
+    }
+
     #user-input {
-      width: 75%;
+      flex: 1;
       padding: 10px;
       border: 1px solid #ccc;
-      border-radius: 6px;
+      border-radius: 8px;
       font-size: 14px;
     }
 
     button {
-      padding: 10px 15px;
-      margin-left: 5px;
+      padding: 10px 20px;
       border: none;
-      border-radius: 6px;
+      border-radius: 8px;
       background-color: #3498db;
       color: white;
       font-size: 14px;
       cursor: pointer;
+      transition: background-color 0.2s;
     }
 
     button:hover {
@@ -103,7 +117,7 @@
 
     <div id="chat-box"></div>
 
-    <div>
+    <div class="input-area">
       <input type="text" id="user-input" placeholder="메시지를 입력하세요" />
       <button onclick="sendMessage()">보내기</button>
     </div>
@@ -171,5 +185,6 @@
   </script>
 </body>
 </html>
+
 
 
