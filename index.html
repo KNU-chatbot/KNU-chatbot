@@ -57,26 +57,28 @@
       max-width: 100%;
     }
 
-    /* ✅ 핵심 정렬 수정 */
     .chat-message.bot {
       justify-content: flex-start;
     }
+
     .chat-message.user {
       justify-content: flex-end;
       flex-direction: row-reverse;
     }
 
     .chat-bubble {
-      display: inline-block;
-      padding: 10px 12px;
+      display: block;                /* ✅ 핵심: 내부 왼쪽 정렬용 */
+      width: fit-content;
+      max-width: 70%;
+      padding: 10px 14px;            /* ✅ 여백 조정 */
+      margin: 0;                     /* ✅ 여백 초기화 */
       border-radius: 12px;
       line-height: 1.4;
       word-wrap: break-word;
       white-space: pre-wrap;
-      text-align: left;
+      text-align: left;              /* ✅ 텍스트 왼쪽 정렬 */
       background-color: #f2f2f2;
       color: #111;
-      max-width: 70%;
     }
 
     .chat-message.user .chat-bubble {
@@ -90,7 +92,7 @@
 
     .avatar {
       font-size: 20px;
-      margin: 0 6px;
+      margin: 0 4px 0 0;             /* ✅ 아이콘과 말풍선 간격 축소 */
       user-select: none;
     }
 
@@ -228,3 +230,4 @@
   </script>
 </body>
 </html>
+
