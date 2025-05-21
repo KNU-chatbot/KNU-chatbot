@@ -141,7 +141,20 @@
       font-size: 18px;
     }
 
-    /* 👇 핵심! 자연스러운 순차 점 애니메이션 */
+    /* ✅ 로딩 말풍선(점...)은 여백 최소화! */
+    .chat-bubble.loading-bubble {
+      padding: 1px 4px 1px 4px !important; /* 위, 오, 아래, 왼 */
+      font-size: 20px !important;
+      line-height: 1 !important;
+      min-width: 0 !important;
+      min-height: 0 !important;
+      background-color: #f7f7f7 !important;
+      box-shadow: none !important;
+      margin: 0 !important;
+      border-radius: 10px !important;
+    }
+
+    /* 점 bounce 애니메이션 */
     .loading-dots {
       display: inline-block;
       white-space: nowrap;
@@ -263,7 +276,7 @@
       loadingMessage.className = "chat-message bot";
       loadingMessage.innerHTML = `
         <div class="avatar">🤖</div>
-        <div class="chat-bubble">
+        <div class="chat-bubble loading-bubble">
           <span class="loading-dots">
             <span>.</span><span>.</span><span>.</span>
           </span>
