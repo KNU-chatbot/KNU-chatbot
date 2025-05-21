@@ -168,7 +168,7 @@
     scrollToBottom();
   }
 
-  // ★★★ SSE fetch + 스트리밍 구현 ★★★
+  // ★★★ SSE fetch + 스트리밍 구현 (스트리밍 중에는 linkify 적용 X, 마지막에만 적용) ★★★
   async function sendMessage(customInput) {
     const inputElem = document.getElementById("user-input");
     const input = customInput || inputElem.value.trim();
@@ -223,7 +223,7 @@
         for (const part of parts) {
           if (part.startsWith("data:")) {
             const data = part.replace(/^data:\s*/, "");
-            // 처음 chunk라면, loading bubble을 치환해서 사용
+            // ★ 중간에는 절대로 linkify 적용하지 않고, textContent만 추가 ★
             if (isFirst && loadingMessage && loadingMessage.parentNode) {
               const bubble = loadingMessage.querySelector(".chat-bubble");
               bubble.textContent = "";
@@ -240,7 +240,7 @@
 
       clearTimeout(loadingTimer);
 
-      // 마지막에 하이퍼링크 변환
+      // ★★★ 마지막에만 linkify 적용! (스트리밍 중에는 절대 linkify 금지) ★★★
       if (chatBubble) {
         chatBubble.innerHTML = linkify(chatBubble.textContent);
       }
