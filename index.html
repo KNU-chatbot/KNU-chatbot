@@ -213,9 +213,10 @@
   let controller = null;
   let loadingMessage = null;
 
-  // 자동 스크롤 함수!
+  // 최신 채팅으로 스크롤: 입력창 밑까지가 아니라, 마지막 메시지까지!
   function scrollToBottom() {
-    window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+    const chatBox = document.getElementById("chat-box");
+    chatBox.lastElementChild?.scrollIntoView({ behavior: "smooth" });
   }
 
   function timeoutFetch(url, options, timeout = 10000) {
@@ -324,7 +325,7 @@
 
       if (loadingMessage && loadingMessage.parentNode) {
         loadingMessage.querySelector(".chat-bubble").textContent = "";
-        typeText(loadingMessage.querySelector(".chat-bubble"), answer, 0, true); // 자동스크롤도 같이
+        typeText(loadingMessage.querySelector(".chat-bubble"), answer, 0, true);
         const cancelBtn = loadingMessage.querySelector('.cancel-x');
         if (cancelBtn) cancelBtn.remove();
       }
