@@ -28,7 +28,7 @@
       font-size: 15px;
       line-height: 1.6;
       color: #222;
-      white-space: pre-line;   /* 줄바꿈/공백 보존 */
+      white-space: pre-line;
     }
     .chat-message.user .chat-bubble { background: #e1f0ff; margin-left: auto; }
     .avatar { font-size: 22px; margin: 0 8px 0 0; user-select: none; }
@@ -82,6 +82,15 @@
   let loadingMessage = null;
   let loadingTimer = null;
   let streamReader = null;
+
+  // 줄바꿈/여러 칸 띄어쓰기 보존 함수
+  function formatText(text) {
+    // 연속 공백 2개 이상은 &nbsp;로 변환
+    let replaced = text.replace(/  /g, " &nbsp;");
+    // 줄바꿈 \n도 <br>로 변환
+    replaced = replaced.replace(/\n/g, "<br>");
+    return replaced;
+  }
 
   function scrollToBottom() {
     window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
@@ -141,7 +150,7 @@
     const chatBox = document.getElementById("chat-box");
     const msg = document.createElement("div");
     msg.className = "chat-message user";
-    msg.innerHTML = `<div class="avatar">🙋‍♂️</div><div class="chat-bubble">${text}</div>`;
+    msg.innerHTML = `<div class="avatar">🙋‍♂️</div><div class="chat-bubble">${formatText(text)}</div>`;
     chatBox.appendChild(msg);
     scrollToBottom();
   }
@@ -163,7 +172,7 @@
     const chatBox = document.getElementById("chat-box");
     const msg = document.createElement("div");
     msg.className = "chat-message bot";
-    msg.innerHTML = `<div class="avatar">🤖</div><div class="chat-bubble">${linkify(text)}</div>`;
+    msg.innerHTML = `<div class="avatar">🤖</div><div class="chat-bubble">${formatText(linkify(text))}</div>`;
     chatBox.appendChild(msg);
     scrollToBottom();
   }
@@ -213,13 +222,11 @@
         const { done, value } = await reader.read();
         if (done) break;
         buffer += decoder.decode(value, { stream: true });
-        let parts = buffer.split("\n"); // ★★★ 핵심 수정: "\n"으로 변경
+        let parts = buffer.split("\n");
         buffer = parts.pop();
         for (const part of parts) {
           if (part.startsWith("data:")) {
             const data = part.replace(/^data:\s*/, "");
-            // ↓↓↓ delta, currentText 로그 추가 (조건 없이 누적) ↓↓↓
-            console.log('delta:', JSON.stringify(data));
             if (isFirst && loadingMessage && loadingMessage.parentNode) {
               const bubble = loadingMessage.querySelector(".chat-bubble");
               bubble.innerHTML = "";
@@ -228,17 +235,15 @@
               currentText = "";
             }
             if (chatBubble) {
-              // 조건문 없이 data 무조건 누적!
               currentText += data;
-              console.log('currentText:', JSON.stringify(currentText));
               // 문장 단위로 <br> 처리(완성된 문장만 줄바꿈)
               const sentenceRegex = /.*?[.!?](?=\s|$)/g;
               let sentences = currentText.match(sentenceRegex) || [];
               let usedLength = sentences.reduce((sum, s) => sum + s.length, 0);
               let incomplete = currentText.slice(usedLength);
-              let html = sentences.map(linkify).join("<br>");
+              let html = sentences.map(linkify).join("\n"); // 일단 \n으로 합침
               if (incomplete) html += linkify(incomplete);
-              chatBubble.innerHTML = html;
+              chatBubble.innerHTML = formatText(html); // 줄바꿈/띄어쓰기 보존
               scrollToBottom();
             }
           }
