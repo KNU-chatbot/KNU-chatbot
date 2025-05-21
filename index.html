@@ -243,12 +243,7 @@
       loadingMessage.parentNode.removeChild(loadingMessage);
       loadingMessage = null;
     }
-    const chatBox = document.getElementById("chat-box");
-    chatBox.innerHTML += `
-      <div class="chat-message bot">
-        <div class="avatar">🤖</div>
-        <div class="chat-bubble">⚠️ 서버 연결에 실패했어요.  </div>
-      </div>`;
+    appendBotMessage("⚠️ 서버 연결에 실패했어요.");
     hideLoading();
     scrollToBottom();
   }
@@ -270,11 +265,15 @@
 
   function initChat() {
     const chatBox = document.getElementById("chat-box");
-    chatBox.innerHTML = `
-      <div class="chat-message bot">
-        <div class="avatar">🤖</div>
-        <div class="chat-bubble bot-intro">⚡ 무엇이든 물어보세요! 경북대학교 전기공학과 챗봇입니다.  </div>
-      </div>`;
+    chatBox.innerHTML = ""; // 💡초기화
+    // 인트로 메시지도 appendChild로
+    const intro = document.createElement("div");
+    intro.className = "chat-message bot";
+    intro.innerHTML = `
+      <div class="avatar">🤖</div>
+      <div class="chat-bubble bot-intro">⚡ 무엇이든 물어보세요! 경북대학교 전기공학과 챗봇입니다.  </div>
+    `;
+    chatBox.appendChild(intro);
     scrollToBottom();
   }
 
@@ -287,23 +286,43 @@
     document.getElementById("send-btn").disabled = false;
   }
 
+  // 💡 메시지 append용 함수 (user/bot)
+  function appendUserMessage(text) {
+    const chatBox = document.getElementById("chat-box");
+    const msg = document.createElement("div");
+    msg.className = "chat-message user";
+    msg.innerHTML = `
+      <div class="avatar">🙋‍♂️</div>
+      <div class="chat-bubble">${text}</div>
+    `;
+    chatBox.appendChild(msg);
+    scrollToBottom();
+  }
+  function appendBotMessage(text) {
+    const chatBox = document.getElementById("chat-box");
+    const msg = document.createElement("div");
+    msg.className = "chat-message bot";
+    msg.innerHTML = `
+      <div class="avatar">🤖</div>
+      <div class="chat-bubble">${text}</div>
+    `;
+    chatBox.appendChild(msg);
+    scrollToBottom();
+  }
+
   async function sendMessage(customInput) {
     const inputElem = document.getElementById("user-input");
-    const chatBox = document.getElementById("chat-box");
     const input = customInput || inputElem.value.trim();
     if (input === "") return;
 
-    chatBox.innerHTML += `
-      <div class="chat-message user">
-        <div class="avatar">🙋‍♂️</div>
-        <div class="chat-bubble">${input}</div>
-      </div>`;
+    appendUserMessage(input);
     if (!customInput) inputElem.value = "";
-    scrollToBottom();
 
     showLoading();
 
     try {
+      // 💡로딩 메시지도 appendChild로 추가
+      const chatBox = document.getElementById("chat-box");
       loadingMessage = document.createElement("div");
       loadingMessage.className = "chat-message bot";
       loadingMessage.innerHTML = `
@@ -324,8 +343,9 @@
       const answer = data.answer;
 
       if (loadingMessage && loadingMessage.parentNode) {
-        loadingMessage.querySelector(".chat-bubble").textContent = "";
-        typeText(loadingMessage.querySelector(".chat-bubble"), answer, 0, true);
+        const bubble = loadingMessage.querySelector(".chat-bubble");
+        bubble.textContent = "";
+        typeText(bubble, answer, 0, true);
         const cancelBtn = loadingMessage.querySelector('.cancel-x');
         if (cancelBtn) cancelBtn.remove();
       }
@@ -334,12 +354,7 @@
         loadingMessage.parentNode.removeChild(loadingMessage);
         loadingMessage = null;
       }
-      chatBox.innerHTML += `
-        <div class="chat-message bot">
-          <div class="avatar">🤖</div>
-          <div class="chat-bubble">⚠️ 서버 연결에 실패했어요.  </div>
-        </div>`;
-      scrollToBottom();
+      appendBotMessage("⚠️ 서버 연결에 실패했어요.");
     }
     hideLoading();
   }
