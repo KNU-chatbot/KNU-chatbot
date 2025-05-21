@@ -18,19 +18,26 @@
       display: flex;
       flex-direction: column;
     }
-    .container {
-      max-width: 850px;
-      margin: 0 auto;
-      width: 100%;
-      flex: 1 1 auto;
-      display: flex;
-      flex-direction: column;
-      position: relative;
-    }
+    /* 헤더 고정 */
     header {
-      padding: 20px 0 10px 0; border-bottom: 1px solid #eee;
+      position: fixed;
+      top: 0; left: 0; width: 100%;
+      z-index: 10;
       background: #fff;
+      padding: 20px 0 10px 0;
+      border-bottom: 1px solid #eee;
+      display: flex; align-items: center; justify-content: center;
+      box-sizing: border-box;
+    }
+    .header-inner {
+      width: 100%;
+      max-width: 850px;
       display: flex; align-items: center; justify-content: space-between;
+      padding: 0 16px;
+      box-sizing: border-box;
+    }
+    .header-title {
+      display: flex; align-items: center;
     }
     h1 {
       font-size: 20px;
@@ -44,6 +51,19 @@
       cursor: pointer; color: #888;
     }
     #reset-btn:hover { color: #222; }
+
+    .container {
+      max-width: 850px;
+      margin: 0 auto;
+      width: 100%;
+      flex: 1 1 auto;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      /* 헤더 높이만큼 여백! */
+      padding-top: 70px;
+      box-sizing: border-box;
+    }
     #chat-box {
       flex: 1 1 auto;
       overflow-x: hidden;
@@ -71,7 +91,7 @@
     }
     .chat-message.user .chat-bubble {
       background: #e1f0ff;
-      margin-left: auto;  /* 오른쪽 정렬 */
+      margin-left: auto;
     }
     .avatar { font-size: 22px; margin: 0 8px 0 0; user-select: none; }
     .bot-intro {
@@ -163,6 +183,7 @@
     @media (max-width: 900px) {
       .container { max-width: 100vw; }
       .recommend-box { display: none; }
+      header, .header-inner { max-width: 100vw !important; }
     }
     textarea:disabled, button:disabled {
       opacity: 0.5; cursor: not-allowed;
@@ -170,18 +191,20 @@
   </style>
 </head>
 <body>
+  <header>
+    <div class="header-inner">
+      <div class="header-title">
+        <img alt="KNU 로고" class="logo" src="knu_logo.jpg"/>
+        <h1>경북대학교 전기공학과 챗봇</h1>
+      </div>
+      <button id="reset-btn" title="채팅 초기화">🗑️</button>
+    </div>
+  </header>
   <div class="recommend-box">
     <button class="recommend-btn" onclick="sendRecommendedQuestion('졸업 요건이 어떻게 되나요?')">🎓 졸업 요건</button>
     <button class="recommend-btn" onclick="sendRecommendedQuestion('교수님 이메일은 어디서 확인해요?')">📬 교수님 이메일</button>
   </div>
   <div class="container">
-    <header>
-      <div style="display: flex; align-items: center;">
-        <img alt="KNU 로고" class="logo" src="knu_logo.jpg"/>
-        <h1>경북대학교 전기공학과 챗봇</h1>
-      </div>
-      <button id="reset-btn" title="채팅 초기화">🗑️</button>
-    </header>
     <div id="chat-box"></div>
   </div>
   <div class="input-area">
