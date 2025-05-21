@@ -1,10 +1,11 @@
 <!DOCTYPE html>
+
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>경북대학교 전기공학과 챗봇</title>
-  <style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>경북대학교 전기공학과 챗봇</title>
+<style>
     html, body {
       margin: 0; padding: 0; height: 100%;
       background-color: #ffffff;
@@ -126,32 +127,51 @@
     textarea:disabled, button:disabled {
       opacity: 0.5; cursor: not-allowed;
     }
-  </style>
+  
+@keyframes bounceDots {
+  0% { transform: translateY(0); }
+  25% { transform: translateY(-3px); }
+  50% { transform: translateY(0); }
+  75% { transform: translateY(3px); }
+  100% { transform: translateY(0); }
+}
+.loading-dots {
+  display: inline-block;
+  animation: bounceDots 1s infinite;
+}
+.cancel-x {
+  color: red;
+  margin-left: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  user-select: none;
+}
+.cancel-x:hover {
+  color: darkred;
+}
+</style>
 </head>
 <body>
-  <div class="container">
-    <div class="loading-overlay" id="loading">
-      <div class="spinner"></div>
-      <button class="cancel-btn" onclick="cancelRequest()">⛔ 요청 취소</button>
-    </div>
-    <div class="recommend-box">
-      <button class="recommend-btn" onclick="sendRecommendedQuestion('졸업 요건이 어떻게 되나요?')">🎓 졸업 요건</button>
-      <button class="recommend-btn" onclick="sendRecommendedQuestion('교수님 이메일은 어디서 확인해요?')">📬 교수님 이메일</button>
-    </div>
-    <header>
-      <div class="header-title">
-        <img src="knu_logo.jpg" alt="KNU 로고" class="logo" />
-        <h1>경북대학교 전기공학과 챗봇</h1>
-      </div>
-      <button id="reset-btn" title="채팅 초기화">🗑️</button>
-    </header>
-    <div id="chat-box"></div>
-    <div class="input-area">
-      <textarea id="user-input" rows="1" placeholder="메시지를 입력하세요 (Shift+Enter 줄바꿈)"></textarea>
-      <button id="send-btn" onclick="sendMessage()">➤</button>
-    </div>
-  </div>
-  <script>
+<div class="container">
+
+<div class="recommend-box">
+<button class="recommend-btn" onclick="sendRecommendedQuestion('졸업 요건이 어떻게 되나요?')">🎓 졸업 요건</button>
+<button class="recommend-btn" onclick="sendRecommendedQuestion('교수님 이메일은 어디서 확인해요?')">📬 교수님 이메일</button>
+</div>
+<header>
+<div class="header-title">
+<img alt="KNU 로고" class="logo" src="knu_logo.jpg"/>
+<h1>경북대학교 전기공학과 챗봇</h1>
+</div>
+<button id="reset-btn" title="채팅 초기화">🗑️</button>
+</header>
+<div id="chat-box"></div>
+<div class="input-area">
+<textarea id="user-input" placeholder="메시지를 입력하세요 (Shift+Enter 줄바꿈)" rows="1"></textarea>
+<button id="send-btn" onclick="sendMessage()">➤</button>
+</div>
+</div>
+<script>
     let controller = null;
 
     function timeoutFetch(url, options, timeout = 10000) {
@@ -204,16 +224,14 @@
     }
 
     function showLoading() {
-      document.getElementById("loading").style.display = "flex";
-      document.getElementById("user-input").disabled = true;
-      document.getElementById("send-btn").disabled = true;
-    }
+  document.getElementById("user-input").disabled = true;
+  document.getElementById("send-btn").disabled = true;
+}
 
-    function hideLoading() {
-      document.getElementById("loading").style.display = "none";
-      document.getElementById("user-input").disabled = false;
-      document.getElementById("send-btn").disabled = false;
-    }
+function hideLoading() {
+  document.getElementById("user-input").disabled = false;
+  document.getElementById("send-btn").disabled = false;
+}
 
     async function sendMessage(customInput) {
       const inputElem = document.getElementById("user-input");
@@ -236,8 +254,11 @@
         const loadingMessage = document.createElement("div");
         loadingMessage.className = "chat-message bot";
         loadingMessage.innerHTML = `
-          <div class="avatar">🤖</div>
-          <div class="chat-bubble">...</div>`;
+  <div class="avatar">🤖</div>
+  <div class="chat-bubble">
+    <span class="loading-dots">...</span>
+    <span class="cancel-x" onclick="cancelRequest()">❌</span>
+  </div>`;
         chatBox.appendChild(loadingMessage);
         chatBox.scrollTop = chatBox.scrollHeight;
 
