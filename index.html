@@ -213,6 +213,11 @@
   let controller = null;
   let loadingMessage = null;
 
+  // 자동 스크롤 함수!
+  function scrollToBottom() {
+    window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+  }
+
   function timeoutFetch(url, options, timeout = 10000) {
     controller = new AbortController();
     options.signal = controller.signal;
@@ -233,7 +238,6 @@
 
   function cancelRequest() {
     if (controller) controller.abort();
-    // 로딩 메시지 삭제
     if (loadingMessage && loadingMessage.parentNode) {
       loadingMessage.parentNode.removeChild(loadingMessage);
       loadingMessage = null;
@@ -245,7 +249,7 @@
         <div class="chat-bubble">⚠️ 서버 연결에 실패했어요.  </div>
       </div>`;
     hideLoading();
-    chatBox.scrollTop = chatBox.scrollHeight;
+    scrollToBottom();
   }
 
   window.onload = function () {
@@ -270,6 +274,7 @@
         <div class="avatar">🤖</div>
         <div class="chat-bubble bot-intro">⚡ 무엇이든 물어보세요! 경북대학교 전기공학과 챗봇입니다.  </div>
       </div>`;
+    scrollToBottom();
   }
 
   function showLoading() {
@@ -293,7 +298,7 @@
         <div class="chat-bubble">${input}</div>
       </div>`;
     if (!customInput) inputElem.value = "";
-    chatBox.scrollTop = chatBox.scrollHeight;
+    scrollToBottom();
 
     showLoading();
 
@@ -306,7 +311,7 @@
         <span class="cancel-x" onclick="cancelRequest()">❎</span>
       `;
       chatBox.appendChild(loadingMessage);
-      chatBox.scrollTop = chatBox.scrollHeight;
+      scrollToBottom();
 
       const response = await timeoutFetch("https://knu-chatbot-backend.onrender.com/ask", {
         method: "POST",
@@ -319,7 +324,7 @@
 
       if (loadingMessage && loadingMessage.parentNode) {
         loadingMessage.querySelector(".chat-bubble").textContent = "";
-        typeText(loadingMessage.querySelector(".chat-bubble"), answer);
+        typeText(loadingMessage.querySelector(".chat-bubble"), answer, 0, true); // 자동스크롤도 같이
         const cancelBtn = loadingMessage.querySelector('.cancel-x');
         if (cancelBtn) cancelBtn.remove();
       }
@@ -333,19 +338,23 @@
           <div class="avatar">🤖</div>
           <div class="chat-bubble">⚠️ 서버 연결에 실패했어요.  </div>
         </div>`;
+      scrollToBottom();
     }
     hideLoading();
-    chatBox.scrollTop = chatBox.scrollHeight;
   }
 
   function sendRecommendedQuestion(text) {
     sendMessage(text);
   }
 
-  function typeText(element, text, index = 0) {
+  // 자동 스크롤까지 적용된 typeText
+  function typeText(element, text, index = 0, doScroll = false) {
     if (index < text.length) {
       element.textContent += text.charAt(index);
-      setTimeout(() => typeText(element, text, index + 1), 20);
+      if (doScroll) scrollToBottom();
+      setTimeout(() => typeText(element, text, index + 1, doScroll), 20);
+    } else {
+      if (doScroll) scrollToBottom();
     }
   }
 </script>
