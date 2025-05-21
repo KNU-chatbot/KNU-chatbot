@@ -242,6 +242,9 @@
   }
 
   function cancelRequest() {
+    // 이미 취소된 상태면 아무것도 하지 않음(중복 안내문 방지)
+    if (!loadingMessage) return;
+
     if (controller) controller.abort();
     if (loadingMessage && loadingMessage.parentNode) {
       loadingMessage.parentNode.removeChild(loadingMessage);
@@ -371,14 +374,16 @@
         typeText(bubble, answer, 0, true);
         const cancelBtn = loadingMessage.querySelector('.cancel-x');
         if (cancelBtn) cancelBtn.remove();
+        loadingMessage = null; // 중요! loadingMessage를 꼭 null로 만들어서 중복 안내 방지
       }
     } catch (error) {
       clearTimeout(loadingTimer);
+      // 이미 취소된 경우엔 안내문을 또 띄우지 않음
       if (loadingMessage && loadingMessage.parentNode) {
         loadingMessage.parentNode.removeChild(loadingMessage);
         loadingMessage = null;
+        appendBotMessage("⚠️ 서버 연결에 실패했어요.");
       }
-      appendBotMessage("⚠️ 서버 연결에 실패했어요.");
     }
     hideLoading();
   }
