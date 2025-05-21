@@ -141,29 +141,33 @@
       font-size: 18px;
     }
 
-    /* ✅ 로딩 말풍선(점...)은 여백 최소화! */
+    /* ✅ 로딩 말풍선 여백 완전 없애기 (flex!) */
     .chat-bubble.loading-bubble {
-      padding: 1px 4px 1px 4px !important; /* 위, 오, 아래, 왼 */
-      font-size: 20px !important;
-      line-height: 1 !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: flex-start !important;
+      padding: 0 !important;
+      margin: 0 !important;
       min-width: 0 !important;
       min-height: 0 !important;
       background-color: #f7f7f7 !important;
-      box-shadow: none !important;
-      margin: 0 !important;
       border-radius: 10px !important;
+      box-shadow: none !important;
+      font-size: 22px !important;
+      line-height: 1 !important;
     }
-
-    /* 점 bounce 애니메이션 */
     .loading-dots {
-      display: inline-block;
-      white-space: nowrap;
-      vertical-align: middle;
+      margin: 0 !important;
+      padding: 0 !important;
+      display: flex !important;
+      align-items: center !important;
+      gap: 1px;
     }
     .loading-dots span {
-      display: inline-block;
-      font-size: 22px;
-      line-height: 1;
+      font-size: 22px !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      display: block !important;
       animation: bounceDot 1s infinite;
     }
     .loading-dots span:nth-child(1) { animation-delay: 0s; }
