@@ -129,7 +129,6 @@
     }
     .cancel-btn:hover { background-color: #eee; }
 
-    /* ✅ 질문추천 버튼: 채팅창 오른쪽에서 32px 바깥에 고정! */
     .recommend-box {
       position: fixed;
       top: 120px;
@@ -166,7 +165,6 @@
       font-size: 18px;
     }
 
-    /* 👇 점 bounce 애니메이션 */
     .loading-dots {
       display: inline-block;
       white-space: nowrap;
@@ -213,10 +211,12 @@
   let controller = null;
   let loadingMessage = null;
 
-  // 최신 채팅으로 스크롤: 입력창 밑까지가 아니라, 마지막 메시지까지!
+  // DOM이 완전히 업데이트 된 뒤에 스크롤!
   function scrollToBottom() {
-    const chatBox = document.getElementById("chat-box");
-    chatBox.lastElementChild?.scrollIntoView({ behavior: "smooth" });
+    requestAnimationFrame(() => {
+      const chatBox = document.getElementById("chat-box");
+      chatBox.lastElementChild?.scrollIntoView({ behavior: "smooth" });
+    });
   }
 
   function timeoutFetch(url, options, timeout = 10000) {
@@ -348,7 +348,6 @@
     sendMessage(text);
   }
 
-  // 자동 스크롤까지 적용된 typeText
   function typeText(element, text, index = 0, doScroll = false) {
     if (index < text.length) {
       element.textContent += text.charAt(index);
