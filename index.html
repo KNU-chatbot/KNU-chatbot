@@ -67,9 +67,8 @@
     </div>
   </div>
 <script>
-  // 페이지가 열릴 때 고유 sessionId를 한 번만 생성
+  // 고유 세션 생성
   const sessionId = crypto.randomUUID();
-
   let controller = null;
   let loadingMessage = null;
   let loadingTimer = null;
@@ -114,7 +113,7 @@
     intro.className = "chat-message bot";
     intro.innerHTML = `
       <div class="avatar">🤖</div>
-      <div class="chat-bubble bot-intro">⚡ 무엇이든 물어보세요! 경북대학교 전기공학과 챗봇입니다. </div>
+      <div class="chat-bubble bot-intro">⚡ 무엇이든 물어보세요! 경북대학교 전기공학과 챗봇입니다.</div>
     `;
     chatBox.appendChild(intro);
     scrollToBottom();
@@ -138,9 +137,9 @@
     scrollToBottom();
   }
 
-  // --- 개선된 하이퍼링크 변환 함수 + 줄바꿈 변환 ---
+  // 하이퍼링크 + 줄바꿈 변환 함수
   function linkify(text) {
-    // URL 패턴: 한글/공백/특수문자 직전까지만 잡기
+    // URL 자동 링크화
     const urlPattern1 = /(https?:\/\/[^\s<>(){}\[\]'"]+[\w/#?&=~%@-])/g;
     const urlPattern2 = /(^|[\s])((www\.[^\s<>(){}\[\]'"]+[\w/#?&=~%@-]))/g;
     text = text.replace(urlPattern1, function(url) {
@@ -152,7 +151,6 @@
     // 줄바꿈(\n)을 <br>로 변환
     return text.replace(/\n/g, "<br>");
   }
-  // ---------------------------
 
   function appendBotMessage(text) {
     const chatBox = document.getElementById("chat-box");
@@ -228,7 +226,7 @@
 
       clearTimeout(loadingTimer);
 
-      // 마지막에만 linkify(링크 변환+줄바꿈 변환) 적용!
+      // 마지막에만 linkify(링크+줄바꿈 변환) 적용!
       if (chatBubble) {
         chatBubble.innerHTML = linkify(chatBubble.textContent);
       }
