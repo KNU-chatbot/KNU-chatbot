@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -137,14 +138,8 @@
     scrollToBottom();
   }
 
-  // 문장 끝(마침표, 물음표, 느낌표) 뒤에서만 줄바꿈 적용!
-  function autoSentenceLineBreak(text) {
-    return text.replace(/([.!?])(?=\s|$)/g, "$1\n");
-  }
-
-  // 하이퍼링크 + 문장단위 줄바꿈 변환 함수
+  // 하이퍼링크 변환
   function linkify(text) {
-    text = autoSentenceLineBreak(text);
     // URL 자동 링크화
     const urlPattern1 = /(https?:\/\/[^\s<>(){}\[\]'"]+[\w/#?&=~%@-])/g;
     const urlPattern2 = /(^|[\s])((www\.[^\s<>(){}\[\]'"]+[\w/#?&=~%@-]))/g;
@@ -154,8 +149,7 @@
     text = text.replace(urlPattern2, function(match, space, url) {
       return `${space}<a href="http://${url}" target="_blank" rel="noopener noreferrer">${url}</a>`;
     });
-    // \n을 <br>로 변환
-    return text.replace(/\n/g, "<br>");
+    return text;
   }
 
   function appendBotMessage(text) {
@@ -167,7 +161,7 @@
     scrollToBottom();
   }
 
-  // SSE fetch + 실시간 문장 줄바꿈 적용
+  // SSE fetch + 실시간 문장 단위 줄바꿈
   async function sendMessage(customInput) {
     const inputElem = document.getElementById("user-input");
     const input = customInput || inputElem.value.trim();
@@ -226,8 +220,14 @@
             }
             if (chatBubble) {
               currentText += data;
-              // 누적된 전체 텍스트에 실시간 문장 줄바꿈+링크 변환 적용!
-              chatBubble.innerHTML = linkify(currentText);
+              // 1. 완성된 문장(마침표, 물음표, 느낌표+공백/끝)까지를 줄바꿈, 미완성은 마지막 줄로
+              const sentenceRegex = /.*?[.!?](?=\s|$)/g;
+              let sentences = currentText.match(sentenceRegex) || [];
+              let usedLength = sentences.reduce((sum, s) => sum + s.length, 0);
+              let incomplete = currentText.slice(usedLength);
+              let html = sentences.map(linkify).join("<br>");
+              if (incomplete) html += linkify(incomplete);
+              chatBubble.innerHTML = html;
               scrollToBottom();
             }
           }
@@ -260,3 +260,4 @@
 </script>
 </body>
 </html>
+    
