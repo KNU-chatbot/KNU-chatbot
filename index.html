@@ -137,8 +137,16 @@
     scrollToBottom();
   }
 
+  // 문장 끝마다 \n을 삽입 (백엔드에서 안 해주는 경우 프론트에서!)
+  function insertNewlinesAfterSentences(text) {
+    // 마침표, 물음표, 느낌표 뒤에(띄어쓰기/문단구분 직전) 줄바꿈 추가
+    return text.replace(/([.!?])(?=\s|$)/g, "$1\n");
+  }
+
   // 하이퍼링크 + 줄바꿈 변환 함수
   function linkify(text) {
+    // 먼저 문장 줄바꿈 적용 (백엔드에서 안 해줄 때만!)
+    text = insertNewlinesAfterSentences(text);
     // URL 자동 링크화
     const urlPattern1 = /(https?:\/\/[^\s<>(){}\[\]'"]+[\w/#?&=~%@-])/g;
     const urlPattern2 = /(^|[\s])((www\.[^\s<>(){}\[\]'"]+[\w/#?&=~%@-]))/g;
@@ -226,7 +234,7 @@
 
       clearTimeout(loadingTimer);
 
-      // 마지막에만 linkify(링크+줄바꿈 변환) 적용!
+      // 마지막에만 linkify(문장 줄바꿈 + 링크 변환) 적용!
       if (chatBubble) {
         chatBubble.innerHTML = linkify(chatBubble.textContent);
       }
