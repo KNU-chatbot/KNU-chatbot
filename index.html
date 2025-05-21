@@ -158,7 +158,7 @@
     scrollToBottom();
   }
 
-  // SSE fetch + 실시간 문장 단위 줄바꿈 + 로그
+  // SSE fetch + 실시간 문장 단위 줄바꿈 + 조건 없는 누적
   async function sendMessage(customInput) {
     const inputElem = document.getElementById("user-input");
     const input = customInput || inputElem.value.trim();
@@ -203,12 +203,14 @@
         const { done, value } = await reader.read();
         if (done) break;
         buffer += decoder.decode(value, { stream: true });
-        let parts = buffer.split("\n\n");
+        let parts = buffer.split("
+
+");
         buffer = parts.pop();
         for (const part of parts) {
           if (part.startsWith("data:")) {
             const data = part.replace(/^data:\s*/, "");
-            // ↓↓↓ delta, currentText 로그 추가 ↓↓↓
+            // ↓↓↓ delta, currentText 로그 추가 (조건 없이 누적) ↓↓↓
             console.log('delta:', JSON.stringify(data));
             if (isFirst && loadingMessage && loadingMessage.parentNode) {
               const bubble = loadingMessage.querySelector(".chat-bubble");
@@ -218,6 +220,7 @@
               currentText = "";
             }
             if (chatBubble) {
+              // 조건문 없이 data 무조건 누적!
               currentText += data;
               console.log('currentText:', JSON.stringify(currentText));
               // 문장 단위로 <br> 처리(완성된 문장만 줄바꿈)
