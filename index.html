@@ -246,6 +246,22 @@
   line-height: 1.4;
   font-size: 14px;
 }
+
+/* Make only loading bubbles compact */
+.chat-message.bot .chat-bubble.loading {
+  padding: 4px 10px !important;
+  margin: 2px 0 !important;
+  font-size: 14px;
+  line-height: 1.4;
+  background-color: #f2f2f2;
+  color: #111;
+}
+
+/* Keep user chat bubble right aligned */
+.chat-message.user {
+  justify-content: flex-end;
+  flex-direction: row-reverse;
+}
 </style>
 </head>
 <body>
@@ -339,7 +355,7 @@ function hideLoading() {
       chatBox.innerHTML += `
         <div class="chat-message user">
           <div class="avatar">🙋‍♂️</div>
-          <div class="chat-bubble">${input}</div>
+          <div class="chat-bubble loading">${input}</div>
         </div>`;
       if (!customInput) inputElem.value = "";
       chatBox.scrollTop = chatBox.scrollHeight;
@@ -352,7 +368,7 @@ function hideLoading() {
         loadingMessage.innerHTML = `
   
   <div class="avatar">🤖</div>
-  <div class="chat-bubble">
+  <div class="chat-bubble loading">
     <span class="loading-dots">
       <span>.</span><span>.</span><span>.</span>
     </span>
@@ -377,7 +393,7 @@ function hideLoading() {
         chatBox.innerHTML += `
           <div class="chat-message bot">
             <div class="avatar">🤖</div>
-            <div class="chat-bubble">⚠️ 서버 연결에 실패했어요.  </div>
+            <div class="chat-bubble loading">⚠️ 서버 연결에 실패했어요.  </div>
           </div>`;
       }
 
