@@ -1,11 +1,10 @@
 <!DOCTYPE html>
-
 <html lang="ko">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>경북대학교 전기공학과 챗봇</title>
-<style>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>경북대학교 전기공학과 챗봇</title>
+  <style>
     html, body {
       margin: 0; padding: 0; height: 100%;
       background-color: #ffffff;
@@ -107,9 +106,7 @@
       cursor: pointer;
       font-size: 14px;
     }
-    .cancel-btn:hover {
-      background-color: #eee;
-    }
+    .cancel-btn:hover { background-color: #eee; }
 
     .recommend-box {
       position: absolute;
@@ -127,290 +124,188 @@
     textarea:disabled, button:disabled {
       opacity: 0.5; cursor: not-allowed;
     }
-  
-@keyframes bounceDots {
-  0% { transform: translateY(0); }
-  25% { transform: translateY(-3px); }
-  50% { transform: translateY(0); }
-  75% { transform: translateY(3px); }
-  100% { transform: translateY(0); }
-}
-.loading-dots {
-  display: inline-block;
-  animation: bounceDots 1s infinite;
-}
-.cancel-x {
-  color: red;
-  margin-left: 8px;
-  cursor: pointer;
-  font-weight: bold;
-  user-select: none;
-}
-.cancel-x:hover {
-  color: darkred;
-}
 
-.chat-message.bot .cancel-x {
-  align-self: center;
-  margin-left: 6px;
-  font-size: 18px;
-}
+    .cancel-x {
+      color: red;
+      margin-left: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      user-select: none;
+    }
+    .cancel-x:hover {
+      color: darkred;
+    }
+    .chat-message.bot .cancel-x {
+      align-self: center;
+      margin-left: 6px;
+      font-size: 18px;
+    }
 
-.loading-dots span {
-  display: inline-block;
-  animation: bounceDot 1s infinite;
-}
-.loading-dots span:nth-child(2) {
-  animation-delay: 0.2s;
-}
-.loading-dots span:nth-child(3) {
-  animation-delay: 0.4s;
-}
-@keyframes bounceDot {
-  0%, 80%, 100% {
-    transform: translateY(0);
-  }
-  40% {
-    transform: translateY(-6px);
-  }
-}
-
-.loading-dots span {
-  display: inline-block;
-  animation: bounceDot 1.2s infinite ease-in-out;
-}
-.loading-dots span:nth-child(1) {
-  animation-delay: 0s;
-}
-.loading-dots span:nth-child(2) {
-  animation-delay: 0.2s;
-}
-.loading-dots span:nth-child(3) {
-  animation-delay: 0.4s;
-}
-@keyframes bounceDot {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-6px);
-  }
-}
-
-.loading-dots span {
-  display: inline-block;
-  animation: bounceDot 1.2s infinite ease-in-out;
-}
-.loading-dots span:nth-child(1) { animation-delay: 0s; }
-.loading-dots span:nth-child(2) { animation-delay: 0.2s; }
-.loading-dots span:nth-child(3) { animation-delay: 0.4s; }
-
-@keyframes bounceDot {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-6px); }
-}
-
-.loading-dots span {
-  display: inline-block;
-  animation: bounceDot 1.2s infinite ease-in-out;
-}
-.loading-dots span:nth-child(1) { animation-delay: 0s; }
-.loading-dots span:nth-child(2) { animation-delay: 0.2s; }
-.loading-dots span:nth-child(3) { animation-delay: 0.4s; }
-
-@keyframes bounceDot {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-6px); }
-}
-
-.loading-dots {
-  display: inline-block;
-  white-space: nowrap;
-}
-.loading-dots span {
-  display: inline-block;
-  animation: bounceDot 1.2s infinite ease-in-out;
-}
-.loading-dots span:nth-child(1) { animation-delay: 0s; }
-.loading-dots span:nth-child(2) { animation-delay: 0.2s; }
-.loading-dots span:nth-child(3) { animation-delay: 0.4s; }
-
-@keyframes bounceDot {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-6px); }
-}
-
-.chat-bubble {
-  padding: 6px 10px !important;
-  margin: 2px 0 !important;
-  line-height: 1.4;
-  font-size: 14px;
-}
-
-/* Make only loading bubbles compact */
-.chat-message.bot .chat-bubble.loading {
-  padding: 4px 10px !important;
-  margin: 2px 0 !important;
-  font-size: 14px;
-  line-height: 1.4;
-  background-color: #f2f2f2;
-  color: #111;
-}
-
-/* Keep user chat bubble right aligned */
-.chat-message.user {
-  justify-content: flex-end;
-  flex-direction: row-reverse;
-}
-</style>
+    /* 👇 핵심! 자연스러운 순차 점 애니메이션 */
+    .loading-dots {
+      display: inline-block;
+      white-space: nowrap;
+      vertical-align: middle;
+    }
+    .loading-dots span {
+      display: inline-block;
+      font-size: 22px;
+      line-height: 1;
+      animation: bounceDot 1s infinite;
+    }
+    .loading-dots span:nth-child(1) { animation-delay: 0s; }
+    .loading-dots span:nth-child(2) { animation-delay: 0.15s; }
+    .loading-dots span:nth-child(3) { animation-delay: 0.3s; }
+    @keyframes bounceDot {
+      0%, 80%, 100% { transform: translateY(0); }
+      30% { transform: translateY(-8px); }
+      50% { transform: translateY(0); }
+    }
+  </style>
 </head>
 <body>
 <div class="container">
-<div class="recommend-box">
-<button class="recommend-btn" onclick="sendRecommendedQuestion('졸업 요건이 어떻게 되나요?')">🎓 졸업 요건</button>
-<button class="recommend-btn" onclick="sendRecommendedQuestion('교수님 이메일은 어디서 확인해요?')">📬 교수님 이메일</button>
-</div>
-<header>
-<div class="header-title">
-<img alt="KNU 로고" class="logo" src="knu_logo.jpg"/>
-<h1>경북대학교 전기공학과 챗봇</h1>
-</div>
-<button id="reset-btn" title="채팅 초기화">🗑️</button>
-</header>
-<div id="chat-box"></div>
-<div class="input-area">
-<textarea id="user-input" placeholder="메시지를 입력하세요 (Shift+Enter 줄바꿈)" rows="1"></textarea>
-<button id="send-btn" onclick="sendMessage()">➤</button>
-</div>
+  <div class="recommend-box">
+    <button class="recommend-btn" onclick="sendRecommendedQuestion('졸업 요건이 어떻게 되나요?')">🎓 졸업 요건</button>
+    <button class="recommend-btn" onclick="sendRecommendedQuestion('교수님 이메일은 어디서 확인해요?')">📬 교수님 이메일</button>
+  </div>
+  <header>
+    <div class="header-title">
+      <img alt="KNU 로고" class="logo" src="knu_logo.jpg"/>
+      <h1>경북대학교 전기공학과 챗봇</h1>
+    </div>
+    <button id="reset-btn" title="채팅 초기화">🗑️</button>
+  </header>
+  <div id="chat-box"></div>
+  <div class="input-area">
+    <textarea id="user-input" placeholder="메시지를 입력하세요 (Shift+Enter 줄바꿈)" rows="1"></textarea>
+    <button id="send-btn" onclick="sendMessage()">➤</button>
+  </div>
 </div>
 <script>
-    let controller = null;
+  let controller = null;
 
-    function timeoutFetch(url, options, timeout = 10000) {
-      controller = new AbortController();
-      options.signal = controller.signal;
-
-      return new Promise((resolve, reject) => {
-        const timer = setTimeout(() => {
-          controller.abort();
-          reject(new Error("timeout"));
-        }, timeout);
-
-        fetch(url, options).then(res => {
-          clearTimeout(timer);
-          resolve(res);
-        }).catch(err => {
-          clearTimeout(timer);
-          reject(err);
-        });
+  function timeoutFetch(url, options, timeout = 10000) {
+    controller = new AbortController();
+    options.signal = controller.signal;
+    return new Promise((resolve, reject) => {
+      const timer = setTimeout(() => {
+        controller.abort();
+        reject(new Error("timeout"));
+      }, timeout);
+      fetch(url, options).then(res => {
+        clearTimeout(timer);
+        resolve(res);
+      }).catch(err => {
+        clearTimeout(timer);
+        reject(err);
       });
-    }
+    });
+  }
 
-    function cancelRequest() {
-      if (controller) controller.abort();
-      hideLoading();
-    }
+  function cancelRequest() {
+    if (controller) controller.abort();
+    hideLoading();
+  }
 
-    window.onload = function () {
+  window.onload = function () {
+    initChat();
+    const inputElem = document.getElementById("user-input");
+    inputElem.addEventListener("keydown", function (event) {
+      if (event.key === "Enter") {
+        if (event.shiftKey) return;
+        event.preventDefault();
+        sendMessage();
+      }
+    });
+    document.getElementById("reset-btn").addEventListener("click", () => {
       initChat();
-      const inputElem = document.getElementById("user-input");
-      inputElem.addEventListener("keydown", function (event) {
-        if (event.key === "Enter") {
-          if (event.shiftKey) return;
-          event.preventDefault();
-          sendMessage();
-        }
-      });
-      document.getElementById("reset-btn").addEventListener("click", () => {
-        initChat();
-      });
-    };
+    });
+  };
 
-    function initChat() {
-      const chatBox = document.getElementById("chat-box");
-      chatBox.innerHTML = `
+  function initChat() {
+    const chatBox = document.getElementById("chat-box");
+    chatBox.innerHTML = `
+      <div class="chat-message bot">
+        <div class="avatar">🤖</div>
+        <div class="chat-bubble bot-intro">⚡ 무엇이든 물어보세요! 경북대학교 전기공학과 챗봇입니다.  </div>
+      </div>`;
+  }
+
+  function showLoading() {
+    document.getElementById("user-input").disabled = true;
+    document.getElementById("send-btn").disabled = true;
+  }
+  function hideLoading() {
+    document.getElementById("user-input").disabled = false;
+    document.getElementById("send-btn").disabled = false;
+  }
+
+  async function sendMessage(customInput) {
+    const inputElem = document.getElementById("user-input");
+    const chatBox = document.getElementById("chat-box");
+    const input = customInput || inputElem.value.trim();
+    if (input === "") return;
+
+    chatBox.innerHTML += `
+      <div class="chat-message user">
+        <div class="avatar">🙋‍♂️</div>
+        <div class="chat-bubble">${input}</div>
+      </div>`;
+    if (!customInput) inputElem.value = "";
+    chatBox.scrollTop = chatBox.scrollHeight;
+
+    showLoading();
+
+    try {
+      // 👇 로딩 중 애니메이션
+      const loadingMessage = document.createElement("div");
+      loadingMessage.className = "chat-message bot";
+      loadingMessage.innerHTML = `
+        <div class="avatar">🤖</div>
+        <div class="chat-bubble">
+          <span class="loading-dots">
+            <span>.</span><span>.</span><span>.</span>
+          </span>
+        </div>
+        <span class="cancel-x" onclick="cancelRequest()">❎</span>
+      `;
+      chatBox.appendChild(loadingMessage);
+      chatBox.scrollTop = chatBox.scrollHeight;
+
+      const response = await timeoutFetch("https://knu-chatbot-backend.onrender.com/ask", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ question: input })
+      }, 30000);
+
+      const data = await response.json();
+      const answer = data.answer;
+
+      const bubble = loadingMessage.querySelector(".chat-bubble");
+      bubble.textContent = "";
+      typeText(bubble, answer);
+    } catch (error) {
+      chatBox.innerHTML += `
         <div class="chat-message bot">
           <div class="avatar">🤖</div>
-          <div class="chat-bubble bot-intro">⚡ 무엇이든 물어보세요! 경북대학교 전기공학과 챗봇입니다.  </div>
+          <div class="chat-bubble">⚠️ 서버 연결에 실패했어요.  </div>
         </div>`;
     }
+    hideLoading();
+    chatBox.scrollTop = chatBox.scrollHeight;
+  }
 
-    function showLoading() {
-  document.getElementById("user-input").disabled = true;
-  document.getElementById("send-btn").disabled = true;
-}
+  function sendRecommendedQuestion(text) {
+    sendMessage(text);
+  }
 
-function hideLoading() {
-  document.getElementById("user-input").disabled = false;
-  document.getElementById("send-btn").disabled = false;
-}
-
-    async function sendMessage(customInput) {
-      const inputElem = document.getElementById("user-input");
-      const chatBox = document.getElementById("chat-box");
-      const input = customInput || inputElem.value.trim();
-
-      if (input === "") return;
-
-      chatBox.innerHTML += `
-        <div class="chat-message user">
-          <div class="avatar">🙋‍♂️</div>
-          <div class="chat-bubble loading">${input}</div>
-        </div>`;
-      if (!customInput) inputElem.value = "";
-      chatBox.scrollTop = chatBox.scrollHeight;
-
-      showLoading();
-
-      try {
-        const loadingMessage = document.createElement("div");
-        loadingMessage.className = "chat-message bot";
-        loadingMessage.innerHTML = `
-  
-  <div class="avatar">🤖</div>
-  <div class="chat-bubble loading">
-    <span class="loading-dots">
-      <span>.</span><span>.</span><span>.</span>
-    </span>
-  </div>
-  <span class="cancel-x" onclick="cancelRequest()">❎</span>`;
-        chatBox.appendChild(loadingMessage);
-        chatBox.scrollTop = chatBox.scrollHeight;
-
-        const response = await timeoutFetch("https://knu-chatbot-backend.onrender.com/ask", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ question: input })
-        }, 30000);
-
-        const data = await response.json();
-        const answer = data.answer;
-
-        const bubble = loadingMessage.querySelector(".chat-bubble");
-        bubble.textContent = "";
-        typeText(bubble, answer);
-      } catch (error) {
-        chatBox.innerHTML += `
-          <div class="chat-message bot">
-            <div class="avatar">🤖</div>
-            <div class="chat-bubble loading">⚠️ 서버 연결에 실패했어요.  </div>
-          </div>`;
-      }
-
-      hideLoading();
-      chatBox.scrollTop = chatBox.scrollHeight;
+  function typeText(element, text, index = 0) {
+    if (index < text.length) {
+      element.textContent += text.charAt(index);
+      setTimeout(() => typeText(element, text, index + 1), 20);
     }
-
-    function sendRecommendedQuestion(text) {
-      sendMessage(text);
-    }
-
-    function typeText(element, text, index = 0) {
-      if (index < text.length) {
-        element.textContent += text.charAt(index);
-        setTimeout(() => typeText(element, text, index + 1), 20);
-      }
-    }
-  </script>
+  }
+</script>
 </body>
 </html>
