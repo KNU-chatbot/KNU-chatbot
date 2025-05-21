@@ -28,7 +28,7 @@
       font-size: 15px;
       line-height: 1.6;
       color: #222;
-      white-space: pre-line;
+      /* white-space: pre-line;  // 더 이상 필요없음! */
     }
     .chat-message.user .chat-bubble { background: #e1f0ff; margin-left: auto; }
     .avatar { font-size: 22px; margin: 0 8px 0 0; user-select: none; }
@@ -83,13 +83,28 @@
   let loadingTimer = null;
   let streamReader = null;
 
-  // 줄바꿈/여러 칸 띄어쓰기 보존 함수
-  function formatText(text) {
-    // 연속 공백 2개 이상은 &nbsp;로 변환
-    let replaced = text.replace(/  /g, " &nbsp;");
-    // 줄바꿈 \n도 <br>로 변환
-    replaced = replaced.replace(/\n/g, "<br>");
-    return replaced;
+  // 줄바꿈, 여러칸 띄어쓰기, 링크까지 모두 보존
+  function preserveWhitespace(text) {
+    // HTML escape
+    text = text
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+
+    // 링크 변환 (http/https)
+    text = text.replace(/(https?:\/\/[^\s<>(){}\[\]'"]+[\w/#?&=~%@-])/g, function(url) {
+      return `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`;
+    });
+
+    // 연속 띄어쓰기 2칸 이상 → &nbsp;
+    text = text.replace(/ {2,}/g, function(space) {
+      return "&nbsp;".repeat(space.length);
+    });
+
+    // 줄바꿈(\n) → <br>
+    text = text.replace(/\n/g, "<br>");
+
+    return text;
   }
 
   function scrollToBottom() {
@@ -150,29 +165,16 @@
     const chatBox = document.getElementById("chat-box");
     const msg = document.createElement("div");
     msg.className = "chat-message user";
-    msg.innerHTML = `<div class="avatar">🙋‍♂️</div><div class="chat-bubble">${formatText(text)}</div>`;
+    msg.innerHTML = `<div class="avatar">🙋‍♂️</div><div class="chat-bubble">${preserveWhitespace(text)}</div>`;
     chatBox.appendChild(msg);
     scrollToBottom();
-  }
-
-  // 하이퍼링크 변환
-  function linkify(text) {
-    const urlPattern1 = /(https?:\/\/[^\s<>(){}\[\]'"]+[\w/#?&=~%@-])/g;
-    const urlPattern2 = /(^|[\s])((www\.[^\s<>(){}\[\]'"]+[\w/#?&=~%@-]))/g;
-    text = text.replace(urlPattern1, function(url) {
-      return `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`;
-    });
-    text = text.replace(urlPattern2, function(match, space, url) {
-      return `${space}<a href="http://${url}" target="_blank" rel="noopener noreferrer">${url}</a>`;
-    });
-    return text;
   }
 
   function appendBotMessage(text) {
     const chatBox = document.getElementById("chat-box");
     const msg = document.createElement("div");
     msg.className = "chat-message bot";
-    msg.innerHTML = `<div class="avatar">🤖</div><div class="chat-bubble">${formatText(linkify(text))}</div>`;
+    msg.innerHTML = `<div class="avatar">🤖</div><div class="chat-bubble">${preserveWhitespace(text)}</div>`;
     chatBox.appendChild(msg);
     scrollToBottom();
   }
@@ -236,14 +238,8 @@
             }
             if (chatBubble) {
               currentText += data;
-              // 문장 단위로 <br> 처리(완성된 문장만 줄바꿈)
-              const sentenceRegex = /.*?[.!?](?=\s|$)/g;
-              let sentences = currentText.match(sentenceRegex) || [];
-              let usedLength = sentences.reduce((sum, s) => sum + s.length, 0);
-              let incomplete = currentText.slice(usedLength);
-              let html = sentences.map(linkify).join("\n"); // 일단 \n으로 합침
-              if (incomplete) html += linkify(incomplete);
-              chatBubble.innerHTML = formatText(html); // 줄바꿈/띄어쓰기 보존
+              // 문장 단위로 줄바꿈, 링크 처리까지!
+              chatBubble.innerHTML = preserveWhitespace(currentText);
               scrollToBottom();
             }
           }
