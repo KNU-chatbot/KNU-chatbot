@@ -212,6 +212,9 @@
     </div>
   </div>
 <script>
+  // 페이지가 열릴 때 고유 sessionId를 한 번만 생성
+  const sessionId = crypto.randomUUID();
+
   let controller = null;
   let loadingMessage = null;
   let loadingTimer = null;
@@ -295,7 +298,7 @@
     scrollToBottom();
   }
 
-  // --- 하이퍼링크 변환 함수 추가 ---
+  // --- 하이퍼링크 변환 함수 ---
   function linkify(text) {
     // http(s)://로 시작하는 주소
     const urlPattern1 = /(https?:\/\/[^\s]+)/g;
@@ -311,7 +314,7 @@
     });
     return text;
   }
-  // ---------------------------------
+  // ---------------------------
 
   function appendBotMessage(text) {
     const chatBox = document.getElementById("chat-box");
@@ -350,10 +353,11 @@
         cancelRequest();
       }, 30000);
 
+      // ✅ session_id도 같이 전송!
       const response = await timeoutFetch("https://knu-chatbot-backend.onrender.com/ask", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ question: input })
+        body: JSON.stringify({ session_id: sessionId, question: input })
       }, 30000);
 
       clearTimeout(loadingTimer);
