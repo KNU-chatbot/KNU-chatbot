@@ -131,10 +131,13 @@
     }
     .cancel-btn:hover { background-color: #eee; }
 
+    /* ✅ 질문추천 버튼: 항상 화면 우상단 고정! */
     .recommend-box {
-      position: absolute;
-      top: 120px; right: -140px;
+      position: fixed;  /* absolute → fixed! */
+      top: 120px;
+      right: 32px;
       display: flex; flex-direction: column; gap: 10px;
+      z-index: 1200;
     }
     .recommend-btn {
       background-color: #f7f7f7; color: #111;
