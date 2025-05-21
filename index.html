@@ -294,11 +294,31 @@
     chatBox.appendChild(msg);
     scrollToBottom();
   }
+
+  // --- 하이퍼링크 변환 함수 추가 ---
+  function linkify(text) {
+    // http(s)://로 시작하는 주소
+    const urlPattern1 = /(https?:\/\/[^\s]+)/g;
+    // www.로 시작하는 주소 (http 없는 버전)
+    const urlPattern2 = /(^|[\s])((www\.[^\s]+))/g;
+    // http/https로 시작하는 경우
+    text = text.replace(urlPattern1, function(url) {
+      return `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`;
+    });
+    // www.으로 시작하는 경우 (앞에 이미 링크가 아닌 경우)
+    text = text.replace(urlPattern2, function(match, space, url) {
+      return `${space}<a href="http://${url}" target="_blank" rel="noopener noreferrer">${url}</a>`;
+    });
+    return text;
+  }
+  // ---------------------------------
+
   function appendBotMessage(text) {
     const chatBox = document.getElementById("chat-box");
     const msg = document.createElement("div");
     msg.className = "chat-message bot";
-    msg.innerHTML = `<div class="avatar">🤖</div><div class="chat-bubble">${text}</div>`;
+    // 답변에 링크 자동 변환 적용
+    msg.innerHTML = `<div class="avatar">🤖</div><div class="chat-bubble">${linkify(text)}</div>`;
     chatBox.appendChild(msg);
     scrollToBottom();
   }
@@ -369,6 +389,8 @@
       if (doScroll) scrollToBottom();
       setTimeout(() => typeText(element, text, index + 1, doScroll), 20);
     } else {
+      // 타이핑 끝나면 하이퍼링크 변환
+      element.innerHTML = linkify(element.textContent);
       if (doScroll) scrollToBottom();
     }
   }
