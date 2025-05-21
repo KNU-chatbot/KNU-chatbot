@@ -7,21 +7,27 @@
   <style>
     html, body {
       margin: 0; padding: 0;
-      /* height: 100%;  <= 삭제! */
       background-color: #ffffff;
       font-family: "Segoe UI", "나눔고딕", sans-serif;
+      height: 100%;
+      min-height: 100vh;
+    }
+    body {
+      /* 입력창 고정 위한 여유 공간 확보 */
+      padding-bottom: 72px;
+      box-sizing: border-box;
+      min-height: 100vh;
     }
     .container {
-      display: flex; flex-direction: column;
-      /* height: 100%; <= 삭제! */
       max-width: 800px;
-      min-height: 100vh; /* 최소 높이만 주면 자연스럽게 body 스크롤됨 */
       margin: 0 auto; padding: 0 16px;
       box-sizing: border-box; position: relative;
     }
     header {
       display: flex; align-items: center; justify-content: space-between;
       padding: 16px 0; border-bottom: 1px solid #ddd;
+      background: #fff;
+      position: sticky; top: 0; z-index: 10;
     }
     .header-title { display: flex; align-items: center; }
     .logo { width: 50px; margin-right: 8px; }
@@ -32,11 +38,9 @@
     }
     #reset-btn:hover { color: #111; }
     #chat-box {
-      /* flex: 1;  <= 삭제! */
-      /* overflow-y: auto; <= 이 줄을 주석처리 or 삭제! */
-      overflow-y: visible;
       padding: 16px 0; display: flex;
       flex-direction: column; gap: 10px;
+      /* 내부 스크롤X, 메시지 많아지면 body 스크롤 */
     }
     .chat-message { display: flex; align-items: flex-start; max-width: 100%; }
     .chat-message.bot { justify-content: flex-start; }
@@ -69,8 +73,22 @@
     }
     .avatar { font-size: 20px; margin: 0 4px 0 0; user-select: none; }
     .input-area {
-      display: flex; padding: 12px 0;
+      display: flex; padding: 12px 0 12px 0;
       border-top: 1px solid #ddd; background-color: #fff;
+      position: fixed;
+      left: 0; right: 0; bottom: 0;
+      z-index: 100;
+      max-width: 800px;
+      margin: 0 auto;
+      box-sizing: border-box;
+      width: 100vw;
+      justify-content: center;
+    }
+    .input-area-inner {
+      display: flex;
+      width: 100%;
+      max-width: 800px;
+      padding: 0 16px;
     }
     #user-input {
       flex: 1; padding: 10px;
@@ -182,7 +200,9 @@
     <button id="reset-btn" title="채팅 초기화">🗑️</button>
   </header>
   <div id="chat-box"></div>
-  <div class="input-area">
+</div>
+<div class="input-area">
+  <div class="input-area-inner">
     <textarea id="user-input" placeholder="메시지를 입력하세요 (Shift+Enter 줄바꿈)" rows="1"></textarea>
     <button id="send-btn" onclick="sendMessage()">➤</button>
   </div>
