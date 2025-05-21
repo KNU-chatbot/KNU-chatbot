@@ -167,7 +167,7 @@
     scrollToBottom();
   }
 
-  // SSE fetch + 스트리밍 구현 (스트리밍 중에는 linkify 적용 X, 마지막에만 적용)
+  // SSE fetch + 실시간 문장 줄바꿈 적용
   async function sendMessage(customInput) {
     const inputElem = document.getElementById("user-input");
     const input = customInput || inputElem.value.trim();
@@ -206,6 +206,7 @@
       let buffer = "";
       let isFirst = true;
       let chatBubble = null;
+      let currentText = "";
 
       while (true) {
         const { done, value } = await reader.read();
@@ -218,12 +219,15 @@
             const data = part.replace(/^data:\s*/, "");
             if (isFirst && loadingMessage && loadingMessage.parentNode) {
               const bubble = loadingMessage.querySelector(".chat-bubble");
-              bubble.textContent = "";
+              bubble.innerHTML = "";
               chatBubble = bubble;
               isFirst = false;
+              currentText = "";
             }
             if (chatBubble) {
-              chatBubble.textContent += data;
+              currentText += data;
+              // 누적된 전체 텍스트에 실시간 문장 줄바꿈+링크 변환 적용!
+              chatBubble.innerHTML = linkify(currentText);
               scrollToBottom();
             }
           }
@@ -231,11 +235,6 @@
       }
 
       clearTimeout(loadingTimer);
-
-      // 마지막에만 linkify(문장 줄바꿈 + 링크 변환) 적용!
-      if (chatBubble) {
-        chatBubble.innerHTML = linkify(chatBubble.textContent);
-      }
 
       if (loadingMessage) {
         const cancelBtn = loadingMessage.querySelector('.cancel-x');
