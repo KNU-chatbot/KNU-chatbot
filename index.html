@@ -13,7 +13,6 @@
       min-height: 100vh;
     }
     body {
-      /* 입력창 고정 위한 여유 공간 확보 */
       padding-bottom: 72px;
       box-sizing: border-box;
       min-height: 100vh;
@@ -40,7 +39,6 @@
     #chat-box {
       padding: 16px 0; display: flex;
       flex-direction: column; gap: 10px;
-      /* 내부 스크롤X, 메시지 많아지면 body 스크롤 */
     }
     .chat-message { display: flex; align-items: flex-start; max-width: 100%; }
     .chat-message.bot { justify-content: flex-start; }
@@ -131,11 +129,12 @@
     }
     .cancel-btn:hover { background-color: #eee; }
 
-    /* ✅ 질문추천 버튼: 항상 화면 우상단 고정! */
+    /* ✅ 질문추천 버튼: 채팅창 오른쪽에서 32px 바깥에 고정! */
     .recommend-box {
-      position: fixed;  /* absolute → fixed! */
+      position: fixed;
       top: 120px;
-      right: 32px;
+      left: calc(50% + 400px + 32px);
+      right: unset;
       display: flex; flex-direction: column; gap: 10px;
       z-index: 1200;
     }
