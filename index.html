@@ -137,16 +137,14 @@
     scrollToBottom();
   }
 
-  // 문장 끝마다 \n을 삽입 (백엔드에서 안 해주는 경우 프론트에서!)
-  function insertNewlinesAfterSentences(text) {
-    // 마침표, 물음표, 느낌표 뒤에(띄어쓰기/문단구분 직전) 줄바꿈 추가
+  // 문장 끝(마침표, 물음표, 느낌표) 뒤에서만 줄바꿈 적용!
+  function autoSentenceLineBreak(text) {
     return text.replace(/([.!?])(?=\s|$)/g, "$1\n");
   }
 
-  // 하이퍼링크 + 줄바꿈 변환 함수
+  // 하이퍼링크 + 문장단위 줄바꿈 변환 함수
   function linkify(text) {
-    // 먼저 문장 줄바꿈 적용 (백엔드에서 안 해줄 때만!)
-    text = insertNewlinesAfterSentences(text);
+    text = autoSentenceLineBreak(text);
     // URL 자동 링크화
     const urlPattern1 = /(https?:\/\/[^\s<>(){}\[\]'"]+[\w/#?&=~%@-])/g;
     const urlPattern2 = /(^|[\s])((www\.[^\s<>(){}\[\]'"]+[\w/#?&=~%@-]))/g;
@@ -156,7 +154,7 @@
     text = text.replace(urlPattern2, function(match, space, url) {
       return `${space}<a href="http://${url}" target="_blank" rel="noopener noreferrer">${url}</a>`;
     });
-    // 줄바꿈(\n)을 <br>로 변환
+    // \n을 <br>로 변환
     return text.replace(/\n/g, "<br>");
   }
 
