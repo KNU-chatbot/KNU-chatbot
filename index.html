@@ -149,11 +149,16 @@
 .cancel-x:hover {
   color: darkred;
 }
+
+.chat-message.bot .cancel-x {
+  align-self: center;
+  margin-left: 6px;
+  font-size: 18px;
+}
 </style>
 </head>
 <body>
 <div class="container">
-
 <div class="recommend-box">
 <button class="recommend-btn" onclick="sendRecommendedQuestion('졸업 요건이 어떻게 되나요?')">🎓 졸업 요건</button>
 <button class="recommend-btn" onclick="sendRecommendedQuestion('교수님 이메일은 어디서 확인해요?')">📬 교수님 이메일</button>
@@ -255,10 +260,8 @@ function hideLoading() {
         loadingMessage.className = "chat-message bot";
         loadingMessage.innerHTML = `
   <div class="avatar">🤖</div>
-  <div class="chat-bubble">
-    <span class="loading-dots">...</span>
-    <span class="cancel-x" onclick="cancelRequest()">❌</span>
-  </div>`;
+  <div class="chat-bubble"><span class="loading-dots">...</span></div>
+  <span class="cancel-x" onclick="cancelRequest()">❌</span>`;
         chatBox.appendChild(loadingMessage);
         chatBox.scrollTop = chatBox.scrollHeight;
 
