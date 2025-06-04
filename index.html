@@ -31,7 +31,7 @@
     }
     .chat-message.user .chat-bubble { background: #e1f0ff; margin-left: auto; }
     .avatar { font-size: 22px; margin: 0 8px 0 0; user-select: none; }
-    .bot-intro { background-color: #e0e0e0 !important; font-weight: bold; padding: 10px 8px 10px 10px !important; }
+    .bot-intro { background-color: #e0e0e0 !important; font-weight: bold; padding: 10px 10px 10px 10px !important; }
     .input-area { border-top: 1px solid #eee; background: #fff; padding: 16px 0; display: flex; justify-content: center; align-items: center; width: 100%; }
     .input-area-inner {
       width: 100%; max-width: 850px; display: flex; align-items: center; /* gap은 0으로 두고 직접 margin으로 간격 지정 */
@@ -188,7 +188,7 @@
     intro.className = "chat-message bot";
     intro.innerHTML = `
       <div class="avatar">🤖</div>
-      <div class="chat-bubble bot-intro">⚡ 무엇이든 물어보세요! 경북대학교 전기공학과 챗봇입니다. </div>
+      <div class="chat-bubble bot-intro">⚡ 무엇이든 물어보세요! 경북대학교 전기공학과 챗봇입니다.</div>
     `;
     chatBox.appendChild(intro);
     scrollToBottom();
