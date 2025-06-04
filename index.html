@@ -246,9 +246,10 @@
     try {
       const formData = new FormData();
       formData.append("file", file);
+      formData.append("session_id", sessionId); // ✅ 이 줄 추가!
 
       // 파일 업로드 요청
-      const response = await fetch("https://knu-chatbot-backend.onrender.com/upload", {
+      const response = await fetch("https://knu-chatbot-backend-1.onrender.com/upload", {
         method: "POST",
         body: formData,
       });
@@ -256,6 +257,7 @@
       if (!response.ok) throw new Error("파일 업로드 실패!");
 
       const result = await response.json();
+      console.log("업로드 응답:", result); // ← 추가
 
       lastUploadedFileName = file.name;
       document.getElementById("file-name-display").textContent = `업로드: ${file.name}`;
@@ -295,7 +297,7 @@
       loadingTimer = setTimeout(() => { cancelRequest(); }, 30000);
 
       controller = new AbortController();
-      const response = await fetch("https://knu-chatbot-backend.onrender.com/stream", {
+      const response = await fetch("https://knu-chatbot-backend-1.onrender.com/stream", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ session_id: sessionId, question: input }),
