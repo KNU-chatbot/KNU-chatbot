@@ -34,24 +34,8 @@
     .bot-intro { background-color: #e0e0e0 !important; font-weight: bold; padding: 10px 8px 10px 10px !important; }
     .input-area { border-top: 1px solid #eee; background: #fff; padding: 16px 0; display: flex; justify-content: center; align-items: center; width: 100%; }
     .input-area-inner {
-      width: 100%; max-width: 850px; display: flex; gap: 4px; padding: 0 0; align-items: center;
-      /* gap을 4px로 좁혀서 버튼과 입력창이 더 붙음 */
+      width: 100%; max-width: 850px; display: flex; align-items: center; /* gap은 0으로 두고 직접 margin으로 간격 지정 */
     }
-    #user-input { flex: 1; border: 1px solid #ccc; border-radius: 8px; font-size: 15px; padding: 12px; resize: none; }
-    #send-btn { background: #111; color: #fff; border: none; border-radius: 8px; padding: 10px 18px; font-size: 15px; cursor: pointer; }
-    #send-btn:hover { background: #444; }
-    .cancel-x { color: red; margin-left: 8px; cursor: pointer; font-weight: bold; user-select: none; font-size: 18px; align-self: center; }
-    .cancel-x:hover { color: darkred; }
-    .loading-dots { display: inline-block; white-space: nowrap; vertical-align: middle; }
-    .loading-dots span { display: inline-block; font-size: 22px; line-height: 1; animation: bounceDot 1s infinite; }
-    .loading-dots span:nth-child(1) { animation-delay: 0s; }
-    .loading-dots span:nth-child(2) { animation-delay: 0.15s; }
-    .loading-dots span:nth-child(3) { animation-delay: 0.3s; }
-    @keyframes bounceDot { 0%, 80%, 100% { transform: translateY(0); } 30% { transform: translateY(-8px); } 50% { transform: translateY(0); } }
-    .recommend-box { position: fixed; top: 120px; left: calc(50% + 425px + 32px); display: flex; flex-direction: column; gap: 10px; z-index: 1000; }
-    .recommend-btn { background-color: #f7f7f7; color: #111; border: 1px solid #ccc; border-radius: 6px; padding: 8px 12px; font-size: 14px; cursor: pointer; text-align: left; }
-    .recommend-btn:hover { background-color: #eee; }
-    /* 파일 업로드 버튼 (아이콘만) */
     .file-upload-btn {
       border: none;
       background: #e1f0ff;
@@ -64,7 +48,7 @@
       justify-content: center;
       width: 40px; height: 40px;
       transition: background 0.18s;
-      margin-right: 0;
+      margin-right: 8px;  /* 파일 버튼 ↔ 입력창 간격 */
     }
     .file-upload-btn:hover { background: #b7d6fa; }
     .file-icon {
@@ -75,7 +59,40 @@
       -webkit-mask: url('data:image/svg+xml;utf8,<svg fill="none" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7.757 16.243a4 4 0 0 1 0-5.657l5.657-5.657a4 4 0 0 1 5.657 5.657l-7.07 7.071a2 2 0 1 1-2.829-2.829l7.07-7.071" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>') center / contain no-repeat;
       background-color: #1a4fa4;
     }
+    #file-upload { display:none; }
     #file-name-display { font-size: 13px; color: #888; margin-right: 6px; }
+    #user-input {
+      flex: 1;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 15px;
+      padding: 12px;
+      resize: none;
+      margin-right: 20px;  /* 입력창 ↔ 전송 버튼 간격 */
+      min-width: 0;
+    }
+    #send-btn {
+      background: #111;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 18px;
+      font-size: 15px;
+      cursor: pointer;
+      /* 필요시 width, height 지정 가능 */
+    }
+    #send-btn:hover { background: #444; }
+    .cancel-x { color: red; margin-left: 8px; cursor: pointer; font-weight: bold; user-select: none; font-size: 18px; align-self: center; }
+    .cancel-x:hover { color: darkred; }
+    .loading-dots { display: inline-block; white-space: nowrap; vertical-align: middle; }
+    .loading-dots span { display: inline-block; font-size: 22px; line-height: 1; animation: bounceDot 1s infinite; }
+    .loading-dots span:nth-child(1) { animation-delay: 0s; }
+    .loading-dots span:nth-child(2) { animation-delay: 0.15s; }
+    .loading-dots span:nth-child(3) { animation-delay: 0.3s; }
+    @keyframes bounceDot { 0%, 80%, 100% { transform: translateY(0); } 30% { transform: translateY(-8px); } 50% { transform: translateY(0); } }
+    .recommend-box { position: fixed; top: 120px; left: calc(50% + 425px + 32px); display: flex; flex-direction: column; gap: 10px; z-index: 1000; }
+    .recommend-btn { background-color: #f7f7f7; color: #111; border: 1px solid #ccc; border-radius: 6px; padding: 8px 12px; font-size: 14px; cursor: pointer; text-align: left; }
+    .recommend-btn:hover { background-color: #eee; }
     @media (max-width: 900px) { .container { max-width: 100vw; } .recommend-box { display: none; } header, .header-inner { max-width: 100vw !important; } }
     textarea:disabled, button:disabled { opacity: 0.5; cursor: not-allowed; }
   </style>
@@ -99,11 +116,10 @@
   </div>
   <div class="input-area">
     <div class="input-area-inner">
-      <!-- 아이콘만 보이는 파일 업로드 버튼! -->
       <label for="file-upload" class="file-upload-btn" title="파일 업로드">
         <span class="file-icon"></span>
       </label>
-      <input type="file" id="file-upload" style="display:none;" accept=".pdf,.jpg,.jpeg,.png" />
+      <input type="file" id="file-upload" accept=".pdf,.jpg,.jpeg,.png" />
       <span id="file-name-display"></span>
       <textarea id="user-input" placeholder="메시지를 입력하세요 (Shift+Enter 줄바꿈)" rows="1"></textarea>
       <button id="send-btn" onclick="sendMessage()">➤</button>
