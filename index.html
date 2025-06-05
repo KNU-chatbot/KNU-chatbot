@@ -297,7 +297,7 @@
       const result = await response.json();
       lastUploadedFileName = file.name;
       document.getElementById("file-name-display").textContent = `업로드: ${file.name}`;
-      appendBotMessage(`✅ <b>${file.name}</b> 파일이 성공적으로 업로드되었습니다.`);
+      appendBotMessage(`✅ < ${file.name} > 파일이 성공적으로 업로드되었습니다.`);
     } catch (error) {
       document.getElementById("file-name-display").textContent = "";
       appendBotMessage("⚠️ 파일 업로드에 실패했어요. 다시 시도해 주세요.");
