@@ -172,8 +172,13 @@
       .replace(/&/g, "&amp;")
       .replace(/</g, "&lt;")
       .replace(/>/g, "&gt;");
-    text = text.replace(/(https?:\/\/[^\s<>(){}\[\]'"]+[\w/#?&=~%@-])/g, function(url) {
-      return `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`;
+    // 하이퍼링크 처리: http, https, www 모두 변환
+    text = text.replace(/((https?:\/\/|www\.)[^\s<>(){}\[\]'"]+[\w/#?&=~%@-])/g, function(url) {
+      let href = url;
+      if (url.startsWith("www.")) {
+        href = "http://" + url;
+      }
+      return `<a href="${href}" target="_blank" rel="noopener noreferrer">${url}</a>`;
     });
     text = text.replace(/ {2,}/g, function(space) {
       return "&nbsp;".repeat(space.length);
@@ -297,7 +302,7 @@
       const result = await response.json();
       lastUploadedFileName = file.name;
       document.getElementById("file-name-display").textContent = `업로드: ${file.name}`;
-      appendBotMessage(`✅ < ${file.name} > 파일이 성공적으로 업로드되었습니다.`);
+      appendBotMessage(`✅ <${file.name}> 파일이 성공적으로 업로드되었습니다.`);
     } catch (error) {
       document.getElementById("file-name-display").textContent = "";
       appendBotMessage("⚠️ 파일 업로드에 실패했어요. 다시 시도해 주세요.");
