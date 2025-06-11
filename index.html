@@ -23,7 +23,7 @@
       flex-direction: column;
       position: relative;
       padding-top: 70px;
-      padding-bottom: 88px;  /* 입력창 높이만큼 아래 공간 확보 (ex. 88px, 필요시 조절) */
+      padding-bottom: 88px;
       box-sizing: border-box;
     }
     #chat-box {
@@ -47,12 +47,13 @@
       font-size: 15px;
       line-height: 1.6;
       color: #222;
+      position: relative;
     }
     .chat-message.user .chat-bubble { background: #e1f0ff; margin-left: auto; }
     .avatar { font-size: 22px; margin: 0 8px 0 0; user-select: none; }
     .bot-intro { background-color: #e0e0e0 !important; font-weight: bold; padding: 10px 12px 10px 10px !important; }
     .input-area {
-      position: fixed;   /* 하단 고정 */
+      position: fixed;
       left: 0;
       bottom: 0;
       width: 100%;
@@ -129,6 +130,61 @@
       header, .header-inner { max-width: 100vw !important; }
     }
     textarea:disabled, button:disabled { opacity: 0.5; cursor: not-allowed; }
+    /* ==== 마이크 버튼 동그랗고 효과 적용 ==== */
+    #voice-btn {
+      border-radius: 50%;
+      transition: background 0.18s, border 0.18s;
+    }
+    #voice-btn[aria-pressed="true"] {
+      background: #f75c44 !important;
+      border: 2px solid #f75c44;
+      animation: mic-pulse 1s infinite;
+    }
+    #voice-btn[aria-pressed="true"] svg rect,
+    #voice-btn[aria-pressed="true"] svg path {
+      stroke: #fff !important;
+      transition: stroke 0.1s;
+    }
+    #voice-btn svg rect,
+    #voice-btn svg path {
+      stroke: #111;
+      stroke-width: 2;
+      transition: stroke 0.1s;
+    }
+    @keyframes mic-pulse {
+      0% { box-shadow: 0 0 0 0 #f75c4477; }
+      70% { box-shadow: 0 0 0 10px #f75c4400; }
+      100% { box-shadow: 0 0 0 0 #f75c4400; }
+    }
+    /* ====== 액션 버튼 ====== */
+    .action-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 18px;
+      padding: 4px;
+      border-radius: 50%;
+      transition: background 0.13s;
+      line-height: 1;
+    }
+    .action-btn:hover {
+      background: #eaeaea;
+    }
+    /* 사용자 메시지의 액션 영역 오른쪽 */
+    .user-action-area {
+      display: flex;
+      gap: 6px;
+      justify-content: flex-end;
+      margin-top: 4px;
+      margin-right: 10px;
+    }
+    /* 봇 메시지의 액션 영역 왼쪽 */
+    .bot-action-area {
+      display: flex;
+      gap: 6px;
+      margin-top: 8px;
+      margin-left: 2px;
+    }
   </style>
 </head>
 <body>
@@ -144,6 +200,8 @@
   <div class="recommend-box">
     <button class="recommend-btn" onclick="sendRecommendedQuestion('졸업 요건이 어떻게 되나요?')">🎓 졸업 요건</button>
     <button class="recommend-btn" onclick="sendRecommendedQuestion('교수님 이메일은 어디서 확인해요?')">📬 교수님 이메일</button>
+    <button class="recommend-btn" onclick="sendRecommendedQuestion('교과 과정이 어떻게 되나요?')">📖 교과 과정</button>
+    <button class="recommend-btn" onclick="sendRecommendedQuestion('공지사항은 어디서 확인해요?')">📢 공지사항</button>
   </div>
   <div class="container">
     <div id="chat-box"></div>
@@ -156,6 +214,15 @@
       <input type="file" id="file-upload" accept=".pdf,.jpg,.jpeg,.png" />
       <span id="file-name-display"></span>
       <textarea id="user-input" placeholder="메시지를 입력하세요 (Shift+Enter 줄바꿈)" rows="1"></textarea>
+      <!-- 동그란 마이크 버튼 -->
+      <button id="voice-btn" title="음성 입력" style="background: none; border: none; width:40px; height:40px; margin-right:6px; display:flex; align-items:center; justify-content:center; cursor:pointer; border-radius:50%;">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
+          <rect x="9" y="2" width="6" height="12" rx="3"/>
+          <path d="M5 10v2a7 7 0 0 0 14 0v-2"/>
+          <path d="M12 19v3"/>
+          <path d="M8 22h8"/>
+        </svg>
+      </button>
       <button id="send-btn" onclick="sendMessage()">➤</button>
     </div>
   </div>
@@ -167,12 +234,46 @@
   let streamReader = null;
   let lastUploadedFileName = "";
 
+  // === [액션 버튼 함수들] ===
+  function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(() => {
+      alert('복사되었습니다!');
+    });
+  }
+
+  function speakText(text) {
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      const utter = new SpeechSynthesisUtterance(text.replace(/<br>/g, "\n").replace(/<[^>]+>/g, ""));
+      utter.lang = "ko-KR";
+      window.speechSynthesis.speak(utter);
+    } else {
+      alert('이 브라우저에서는 음성 읽기가 지원되지 않습니다.');
+    }
+  }
+
+  function regenerateResponse(originalQuestion) {
+    sendMessage(originalQuestion);
+  }
+
+  // === [유저 메시지 편집 기능] ===
+  let editingUserMessageId = null; // 현재 편집 중인 메시지 id
+
+  function editUserMessage(messageId, text) {
+    const inputElem = document.getElementById("user-input");
+    inputElem.value = text.replace(/<br>/g, "\n").replace(/<[^>]+>/g, "");
+    inputElem.focus();
+    // 메시지 삭제 (실제 GPT처럼 편집 시 메시지 바로 삭제)
+    const msgDiv = document.getElementById(messageId);
+    if (msgDiv) msgDiv.remove();
+    editingUserMessageId = messageId; // 추후 필요시
+  }
+
   function preserveWhitespace(text) {
     text = text
       .replace(/&/g, "&amp;")
       .replace(/</g, "&lt;")
       .replace(/>/g, "&gt;");
-    // 하이퍼링크 처리: http, https, www 모두 변환
     text = text.replace(/((https?:\/\/|www\.)[^\s<>(){}\[\]'"]+[\w/#?&=~%@-])/g, function(url) {
       let href = url;
       if (url.startsWith("www.")) {
@@ -188,10 +289,8 @@
   }
 
   function scrollToBottom() {
-    // 채팅창이 입력창에 가려지지 않게 스크롤
     const chatBox = document.getElementById("chat-box");
     chatBox.scrollTop = chatBox.scrollHeight;
-    // 추가로 전체 스크롤도 내리기 (PC환경 대응)
     window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
   }
 
@@ -244,39 +343,64 @@
     document.getElementById("send-btn").disabled = true;
     document.getElementById("file-upload").disabled = true;
     document.querySelector(".file-upload-btn").style.opacity = "0.5";
+    document.getElementById("voice-btn").disabled = true;
   }
   function hideLoading() {
     document.getElementById("user-input").disabled = false;
     document.getElementById("send-btn").disabled = false;
     document.getElementById("file-upload").disabled = false;
     document.querySelector(".file-upload-btn").style.opacity = "1";
+    document.getElementById("voice-btn").disabled = false;
   }
+
+  let userMessageSeq = 0; // 사용자 메시지 id용
 
   function appendUserMessage(text) {
     const chatBox = document.getElementById("chat-box");
+    const msgId = `user-msg-${++userMessageSeq}`;
     const msg = document.createElement("div");
     msg.className = "chat-message user";
-    msg.innerHTML = `<div class="avatar">🙋‍♂️</div><div class="chat-bubble">${preserveWhitespace(text)}</div>`;
+    msg.id = msgId;
+    msg.innerHTML = `
+      <div class="avatar">🙋‍♂️</div>
+      <div>
+        <div class="chat-bubble">${preserveWhitespace(text)}</div>
+        <div class="user-action-area">
+          <button class="action-btn" title="메시지 편집" onclick="editUserMessage('${msgId}', '${text.replace(/'/g, "\\'").replace(/\n/g, "\\n").replace(/<[^>]+>/g, "")}')">✏️</button>
+        </div>
+      </div>
+    `;
     chatBox.appendChild(msg);
     scrollToBottom();
   }
 
-  function appendBotMessage(text) {
+  // 챗봇(봇) 메시지에 3개 액션 버튼
+  function appendBotMessage(text, originalQuestion) {
     const chatBox = document.getElementById("chat-box");
     const msg = document.createElement("div");
     msg.className = "chat-message bot";
-    msg.innerHTML = `<div class="avatar">🤖</div><div class="chat-bubble">${preserveWhitespace(text)}</div>`;
+    msg.innerHTML = `
+      <div class="avatar">🤖</div>
+      <div>
+        <div class="chat-bubble">
+          ${preserveWhitespace(text)}
+          <div class="bot-action-area">
+            <button class="action-btn" title="복사" onclick="copyToClipboard('${text.replace(/'/g, "\\'").replace(/\n/g, "\\n").replace(/<br>/g, "\\n").replace(/<[^>]+>/g, "")}')">📋</button>
+            <button class="action-btn" title="음성 읽기" onclick="speakText('${text.replace(/'/g, "\\'").replace(/\n/g, "\\n").replace(/<br>/g, "\\n").replace(/<[^>]+>/g, "")}')">🔊</button>
+            <button class="action-btn" title="응답 재생성" onclick="regenerateResponse('${originalQuestion ? originalQuestion.replace(/'/g, "\\'") : ''}')">🔄</button>
+          </div>
+        </div>
+      </div>
+    `;
     chatBox.appendChild(msg);
     scrollToBottom();
   }
 
-  // 파일 업로드 처리
   async function handleFileUpload(event) {
     const fileInput = event.target;
     const file = fileInput.files[0];
     if (!file) return;
 
-    // 확장자 제한
     const allowedTypes = ['application/pdf', 'image/jpg', 'image/jpeg', 'image/png'];
     if (!allowedTypes.includes(file.type)) {
       alert('PDF, JPG, JPEG, PNG 파일만 업로드할 수 있습니다.');
@@ -291,7 +415,6 @@
       formData.append("file", file);
       formData.append("session_id", sessionId);
 
-      // 파일 업로드 요청
       const response = await fetch("https://knu-chatbot-backend-1.onrender.com/upload", {
         method: "POST",
         body: formData,
@@ -312,7 +435,6 @@
     fileInput.value = "";
   }
 
-  // SSE fetch + 실시간 문장 단위 줄바꿈 + 조건 없는 누적
   async function sendMessage(customInput) {
     const inputElem = document.getElementById("user-input");
     const input = customInput || inputElem.value.trim();
@@ -383,6 +505,7 @@
       if (loadingMessage) {
         const cancelBtn = loadingMessage.querySelector('.cancel-x');
         if (cancelBtn) cancelBtn.remove();
+        appendBotMessage(currentText, input);
         loadingMessage = null;
       }
     } catch (error) {
@@ -400,6 +523,50 @@
 
   function sendRecommendedQuestion(text) {
     sendMessage(text);
+  }
+
+  // === [음성 입력 기능] ===
+  let recognizing = false;
+  let recognition = null;
+
+  if ('webkitSpeechRecognition' in window) {
+    recognition = new webkitSpeechRecognition();
+    recognition.lang = "ko-KR";
+    recognition.continuous = false;
+    recognition.interimResults = false;
+
+    recognition.onstart = function() {
+      recognizing = true;
+      document.getElementById('voice-btn').setAttribute('aria-pressed', 'true');
+    };
+
+    recognition.onend = function() {
+      recognizing = false;
+      document.getElementById('voice-btn').setAttribute('aria-pressed', 'false');
+    };
+
+    recognition.onresult = function(event) {
+      const transcript = event.results[0][0].transcript;
+      document.getElementById('user-input').value = transcript;
+      document.getElementById('user-input').focus();
+    };
+
+    recognition.onerror = function() {
+      recognizing = false;
+      document.getElementById('voice-btn').setAttribute('aria-pressed', 'false');
+    };
+
+    document.getElementById('voice-btn').onclick = function() {
+      if (recognizing) {
+        recognition.stop();
+      } else {
+        recognition.start();
+      }
+    };
+  } else {
+    document.getElementById('voice-btn').onclick = function() {
+      alert('이 브라우저에서는 음성 입력이 지원되지 않습니다.');
+    }
   }
 </script>
 </body>
