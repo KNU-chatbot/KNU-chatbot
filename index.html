@@ -33,23 +33,21 @@
       padding: 24px 0;
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 12px;
     }
-
     .chat-message {
       display: flex;
       max-width: 100%;
     }
     .chat-message.user {
+      width: 100%;
       justify-content: flex-end;
       flex-direction: row-reverse;
-      text-align: right;
       align-items: flex-end;
     }
     .chat-message.bot {
       justify-content: flex-start;
       flex-direction: row;
-      text-align: left;
       align-items: flex-start;
     }
     .chat-message.bot .avatar {
@@ -63,7 +61,6 @@
       align-self: flex-end;
     }
     .avatar { font-size: 22px; user-select: none; }
-
     .chat-bubble {
       background: #f2f2f2;
       border-radius: 12px;
@@ -81,7 +78,7 @@
     }
     .chat-message.user .chat-bubble {
       background: #e1f0ff;
-      margin-left: auto;
+      margin-left: auto; /* 핵심! */
       margin-right: 0;
       text-align: left;
       display: inline-block;
@@ -91,8 +88,10 @@
       background-color: #e0e0e0 !important;
       font-weight: bold;
       padding: 10px 12px 10px 10px !important;
-      max-width: 90% !important;
-      display: inline-block !important;
+      max-width: 48% !important;
+      width: 100% !important;
+      display: block !important;
+      box-sizing: border-box;
     }
     /* ====== 액션 버튼 ====== */
     .bubble-action-user {
@@ -291,7 +290,6 @@
     }
   }
 
-  // ====== 편집/재생성 시 해당 메시지 '포함' 이후 모두 삭제 ======
   function removeMessagesAfter(msgId) {
     const chatBox = document.getElementById("chat-box");
     let found = false;
@@ -302,14 +300,10 @@
     });
     toRemove.forEach(node => chatBox.removeChild(node));
   }
-  // 재생성: 해당 메시지 '포함' 이후 모두 삭제 후, 다시 응답(중복 질문 X)
   function regenerateResponse(botMsgId, originalQuestion) {
-    // 해당 챗봇 메시지 포함 이후 모두 삭제
     removeMessagesAfter(botMsgId);
-    // 바로 챗봇 응답만 다시 생성(질문 중복 없음)
     sendMessage(originalQuestion, true);
   }
-  // 편집: 해당 메시지 '포함' 이후 모두 삭제, 입력창에 복원
   function editUserMessage(userMsgId, text) {
     removeMessagesAfter(userMsgId);
     const inputElem = document.getElementById("user-input");
@@ -378,9 +372,7 @@
     intro.className = "chat-message bot";
     intro.innerHTML = `
       <div class="avatar">🤖</div>
-      <div style="position:relative; width:auto;">
-        <div class="chat-bubble bot-intro">⚡ 무엇이든 물어보세요! 경북대학교 전기공학과 챗봇입니다.</div>
-      </div>
+      <div class="chat-bubble bot-intro">⚡ 무엇이든 물어보세요! 경북대학교 전기공학과 챗봇입니다.</div>
     `;
     chatBox.appendChild(intro);
     scrollToBottom();
@@ -409,17 +401,16 @@
   function appendUserMessage(text) {
     const chatBox = document.getElementById("chat-box");
     const msgId = `user-msg-${++userMessageSeq}`;
-    const msg = document.createElement("div");
+    // 불필요한 래퍼 div 제거!
+    msg = document.createElement("div");
     msg.className = "chat-message user";
     msg.id = msgId;
     msg.innerHTML = `
       <div class="avatar">🙋‍♂️</div>
-      <div style="position:relative; width:auto;">
-        <div class="chat-bubble">
-          ${preserveWhitespace(text)}
-          <div class="bubble-action-user">
-            <button class="action-btn" title="메시지 편집" onclick="editUserMessage('${msgId}', '${text.replace(/'/g, "\\'").replace(/\n/g, "\\n").replace(/<[^>]+>/g, "")}')">✏️</button>
-          </div>
+      <div class="chat-bubble">
+        ${preserveWhitespace(text)}
+        <div class="bubble-action-user">
+          <button class="action-btn" title="메시지 편집" onclick="editUserMessage('${msgId}', '${text.replace(/'/g, "\\'").replace(/\n/g, "\\n").replace(/<[^>]+>/g, "")}')">✏️</button>
         </div>
       </div>
     `;
@@ -431,19 +422,17 @@
   function appendBotMessage(text, originalQuestion) {
     const chatBox = document.getElementById("chat-box");
     const msgId = `bot-msg-${++botMessageSeq}`;
-    const msg = document.createElement("div");
+    msg = document.createElement("div");
     msg.className = "chat-message bot";
     msg.id = msgId;
     msg.innerHTML = `
       <div class="avatar">🤖</div>
-      <div style="position:relative; width:auto;">
-        <div class="chat-bubble">
-          ${preserveWhitespace(text)}
-          <div class="bubble-action-bot">
-            <button class="action-btn" title="복사" onclick="copyToClipboard('${text.replace(/'/g, "\\'").replace(/\n/g, "\\n").replace(/<br>/g, "\\n").replace(/<[^>]+>/g, "")}')">📋</button>
-            <button class="action-btn" title="음성 읽기" onclick="speakText('${text.replace(/'/g, "\\'").replace(/\n/g, "\\n").replace(/<br>/g, "\\n").replace(/<[^>]+>/g, "")}')">🔊</button>
-            <button class="action-btn" title="응답 재생성" onclick="regenerateResponse('${msgId}', '${originalQuestion ? originalQuestion.replace(/'/g, "\\'") : ''}')">🔄</button>
-          </div>
+      <div class="chat-bubble">
+        ${preserveWhitespace(text)}
+        <div class="bubble-action-bot">
+          <button class="action-btn" title="복사" onclick="copyToClipboard('${text.replace(/'/g, "\\'").replace(/\n/g, "\\n").replace(/<br>/g, "\\n").replace(/<[^>]+>/g, "")}')">📋</button>
+          <button class="action-btn" title="음성 읽기" onclick="speakText('${text.replace(/'/g, "\\'").replace(/\n/g, "\\n").replace(/<br>/g, "\\n").replace(/<[^>]+>/g, "")}')">🔊</button>
+          <button class="action-btn" title="응답 재생성" onclick="regenerateResponse('${msgId}', '${originalQuestion ? originalQuestion.replace(/'/g, "\\'") : ''}')">🔄</button>
         </div>
       </div>
     `;
@@ -491,14 +480,12 @@
     fileInput.value = "";
   }
 
-  // sendMessage 수정: isRegenerate 플래그로 중복질문 방지
   async function sendMessage(customInput, isRegenerate = false) {
     const inputElem = document.getElementById("user-input");
     const input = customInput || inputElem.value.trim();
     if (input === "") return;
 
     let userMsgId;
-    // 재질문 상황이 아니라면 사용자 메시지 출력
     if (!isRegenerate) {
       userMsgId = appendUserMessage(input);
       if (!customInput) inputElem.value = "";
@@ -564,7 +551,6 @@
 
       clearTimeout(loadingTimer);
 
-      // stream 끝난 뒤 loading 제거하고, appendBotMessage로 한 번만!
       if (loadingMessage && loadingMessage.parentNode) {
         const cancelBtn = loadingMessage.querySelector('.cancel-x');
         if (cancelBtn) cancelBtn.remove();
@@ -589,7 +575,6 @@
     sendMessage(text);
   }
 
-  // === [음성 입력 기능] ===
   let recognizing = false;
   let recognition = null;
 
