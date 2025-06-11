@@ -35,63 +35,99 @@
       flex-direction: column;
       gap: 12px;
     }
-    .chat-message { display: flex; align-items: flex-end; max-width: 100%; }
+
+    /* ==== 말풍선 & 아바타 레이아웃 ==== */
+    .chat-message {
+      display: flex;
+      max-width: 100%;
+    }
     .chat-message.user {
       justify-content: flex-end;
       flex-direction: row-reverse;
       text-align: right;
+      align-items: flex-end;
     }
     .chat-message.bot {
       justify-content: flex-start;
       flex-direction: row;
       text-align: left;
-    }
-    /* --- 아바타/말풍선 구조 정리 --- */
-    .avatar {
-      font-size: 22px;
-      user-select: none;
-      /* 아래 속성 추가로 bot만 위 정렬, user는 아래 정렬 */
-      display: flex;
       align-items: flex-start;
-      margin-right: 0;
-      margin-left: 0;
-      padding: 0;
-      height: 100%;
     }
+
+    /* 챗봇 아바타(왼쪽 위) + 말풍선 정렬 */
     .chat-message.bot .avatar {
-      align-self: flex-start;
-      margin-top: 2px;
       margin-right: 8px;
       margin-left: 0;
+      align-self: flex-start;
+      /* 아바타를 말풍선의 top에 맞추기 */
     }
+    /* 사용자 아바타(오른쪽 아래) */
     .chat-message.user .avatar {
-      align-self: flex-end;
       margin-left: 8px;
       margin-right: 0;
+      align-self: flex-end;
     }
-    /* --- 말풍선 여백(챗봇/사용자 동일) --- */
+
+    .avatar { font-size: 22px; user-select: none; }
+
+    /* === 말풍선 스타일 (여백 문제 해결) === */
     .chat-bubble {
       background: #f2f2f2;
       border-radius: 12px;
-      padding: 10px 16px 22px 16px;
-      max-width: 70%;
+      padding: 12px 18px 28px 18px;
+      display: inline-block;        /* 핵심: 텍스트 길이만큼만 너비 자동 */
+      max-width: 70%;               /* 기존대로 유지 */
+      min-width: 60px;
       word-break: break-word;
       font-size: 15px;
       line-height: 1.6;
       color: #222;
       position: relative;
-      min-width: 60px;
-      margin: 0;
+      vertical-align: top;
+      box-sizing: border-box;
     }
     .chat-message.user .chat-bubble {
       background: #e1f0ff;
       margin-left: auto;
       margin-right: 0;
       text-align: left;
-      /* 여백 동일하게 */
-      padding: 10px 16px 22px 16px;
+      display: inline-block;        /* 사용자도 동일하게 */
+      max-width: 70%;
     }
     .bot-intro { background-color: #e0e0e0 !important; font-weight: bold; padding: 10px 12px 10px 10px !important; }
+
+    /* ====== 액션 버튼 ====== */
+    .bubble-action-user {
+      position: absolute;
+      bottom: 5px;
+      right: 10px;
+      margin-top: 8px;
+      display: flex;
+      gap: 4px;
+    }
+    .bubble-action-bot {
+      position: absolute;
+      bottom: 5px;
+      left: 10px;
+      margin-top: 8px;
+      display: flex;
+      gap: 4px;
+    }
+    .action-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 15px;
+      padding: 2px;
+      border-radius: 50%;
+      transition: background 0.13s;
+      line-height: 1;
+      margin: 0 0 0 2px;
+      vertical-align: middle;
+    }
+    .action-btn:hover { background: #eaeaea; }
+
+    /* 이하 기존 코드 동일 */
     .input-area {
       position: fixed;
       left: 0;
@@ -196,38 +232,6 @@
       70% { box-shadow: 0 0 0 10px #f75c4400; }
       100% { box-shadow: 0 0 0 0 #f75c4400; }
     }
-    /* ====== 액션 버튼 ====== */
-    .action-btn {
-      background: none;
-      border: none;
-      cursor: pointer;
-      font-size: 15px;
-      padding: 2px;
-      border-radius: 50%;
-      transition: background 0.13s;
-      line-height: 1;
-      margin: 0 0 0 2px;
-      vertical-align: middle;
-    }
-    .action-btn:hover {
-      background: #eaeaea;
-    }
-    .bubble-action-user {
-      position: absolute;
-      bottom: 5px;
-      right: 10px;
-      margin-top: 8px;
-      display: flex;
-      gap: 4px;
-    }
-    .bubble-action-bot {
-      position: absolute;
-      bottom: 5px;
-      left: 10px;
-      margin-top: 8px;
-      display: flex;
-      gap: 4px;
-    }
   </style>
 </head>
 <body>
@@ -292,27 +296,27 @@
     }
   }
 
-  // === 메시지 포함해서 삭제 (자기자신 포함) ===
-  function removeMessagesFrom(msgId) {
+  // ====== 편집/재생성 시 해당 메시지 '포함' 이후 모두 삭제 ======
+
+  function removeMessagesAfter(msgId) {
     const chatBox = document.getElementById("chat-box");
     let found = false;
     const toRemove = [];
     Array.from(chatBox.children).forEach(child => {
-      if (child.id === msgId) found = true;
-      if (found) toRemove.push(child);
+      if (found || child.id === msgId) toRemove.push(child);
+      if (child.id === msgId && !found) found = true;
     });
     toRemove.forEach(node => chatBox.removeChild(node));
   }
 
-  // 응답 재생성(🔄) - 해당 챗봇 메시지 포함 이후 모두 삭제 후 재생성
+  // 재생성: 해당 메시지 '포함' 이후 모두 삭제 후, 다시 응답(재질문 X)
   function regenerateResponse(botMsgId, originalQuestion) {
-    removeMessagesFrom(botMsgId);
-    sendMessage(originalQuestion);
+    removeMessagesAfter(botMsgId);
+    sendMessage(originalQuestion); // 재질문 X, 기존 메시지 하나만 생성
   }
-
-  // 사용자 메시지 편집(✏️) - 해당 메시지 포함 이후 모두 삭제 후 입력창 복원
+  // 편집: 해당 메시지 '포함' 이후 모두 삭제, 입력창에 복원
   function editUserMessage(userMsgId, text) {
-    removeMessagesFrom(userMsgId);
+    removeMessagesAfter(userMsgId);
     const inputElem = document.getElementById("user-input");
     inputElem.value = text.replace(/<br>/g, "\n").replace(/<[^>]+>/g, "");
     inputElem.focus();
@@ -379,7 +383,7 @@
     intro.className = "chat-message bot";
     intro.innerHTML = `
       <div class="avatar">🤖</div>
-      <div style="position:relative; width:100%;">
+      <div style="position:relative; width:auto;">
         <div class="chat-bubble bot-intro">⚡ 무엇이든 물어보세요! 경북대학교 전기공학과 챗봇입니다.</div>
       </div>
     `;
@@ -415,7 +419,7 @@
     msg.id = msgId;
     msg.innerHTML = `
       <div class="avatar">🙋‍♂️</div>
-      <div style="position:relative; width:100%;">
+      <div style="position:relative; width:auto;">
         <div class="chat-bubble">
           ${preserveWhitespace(text)}
           <div class="bubble-action-user">
@@ -437,7 +441,7 @@
     msg.id = msgId;
     msg.innerHTML = `
       <div class="avatar">🤖</div>
-      <div style="position:relative; width:100%;">
+      <div style="position:relative; width:auto;">
         <div class="chat-bubble">
           ${preserveWhitespace(text)}
           <div class="bubble-action-bot">
