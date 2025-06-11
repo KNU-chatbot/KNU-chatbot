@@ -41,16 +41,27 @@
     .chat-bubble {
       background: #f2f2f2;
       border-radius: 12px;
-      padding: 12px 18px;
+      padding: 12px 18px 22px 18px;
       max-width: 70%;
       word-break: break-word;
       font-size: 15px;
       line-height: 1.6;
       color: #222;
       position: relative;
+      min-width: 60px;
     }
-    .chat-message.user .chat-bubble { background: #e1f0ff; margin-left: auto; }
+    .chat-message.user .chat-bubble {
+      background: #e1f0ff;
+      margin-left: auto;
+      margin-right: 0;
+      text-align: left;
+    }
+    .chat-message.user {
+      justify-content: flex-end;
+      flex-direction: row-reverse;
+    }
     .avatar { font-size: 22px; margin: 0 8px 0 0; user-select: none; }
+    .chat-message.user .avatar { margin: 0 0 0 8px; }
     .bot-intro { background-color: #e0e0e0 !important; font-weight: bold; padding: 10px 12px 10px 10px !important; }
     .input-area {
       position: fixed;
@@ -166,24 +177,24 @@
       border-radius: 50%;
       transition: background 0.13s;
       line-height: 1;
+      margin: 0 0 0 2px;
     }
     .action-btn:hover {
       background: #eaeaea;
     }
-    /* 사용자 메시지의 액션 영역 오른쪽 */
-    .user-action-area {
-      display: flex;
-      gap: 6px;
-      justify-content: flex-end;
-      margin-top: 4px;
-      margin-right: 10px;
+    /* 사용자 메시지 액션 (버블 안 우측 아래) */
+    .bubble-action-user {
+      position: absolute;
+      bottom: 4px;
+      right: 10px;
     }
-    /* 봇 메시지의 액션 영역 왼쪽 */
-    .bot-action-area {
+    /* 봇 메시지 액션 (버블 안 좌측 아래) */
+    .bubble-action-bot {
+      position: absolute;
+      bottom: 4px;
+      left: 10px;
       display: flex;
-      gap: 6px;
-      margin-top: 8px;
-      margin-left: 2px;
+      gap: 4px;
     }
   </style>
 </head>
@@ -234,13 +245,11 @@
   let streamReader = null;
   let lastUploadedFileName = "";
 
-  // === [액션 버튼 함수들] ===
   function copyToClipboard(text) {
     navigator.clipboard.writeText(text).then(() => {
       alert('복사되었습니다!');
     });
   }
-
   function speakText(text) {
     if ('speechSynthesis' in window) {
       window.speechSynthesis.cancel();
@@ -251,13 +260,10 @@
       alert('이 브라우저에서는 음성 읽기가 지원되지 않습니다.');
     }
   }
-
   function regenerateResponse(originalQuestion) {
     sendMessage(originalQuestion);
   }
-
-  // === [유저 메시지 편집 기능] ===
-  let editingUserMessageId = null; // 현재 편집 중인 메시지 id
+  let editingUserMessageId = null;
 
   function editUserMessage(messageId, text) {
     const inputElem = document.getElementById("user-input");
@@ -266,7 +272,7 @@
     // 메시지 삭제 (실제 GPT처럼 편집 시 메시지 바로 삭제)
     const msgDiv = document.getElementById(messageId);
     if (msgDiv) msgDiv.remove();
-    editingUserMessageId = messageId; // 추후 필요시
+    editingUserMessageId = messageId;
   }
 
   function preserveWhitespace(text) {
@@ -353,8 +359,7 @@
     document.getElementById("voice-btn").disabled = false;
   }
 
-  let userMessageSeq = 0; // 사용자 메시지 id용
-
+  let userMessageSeq = 0;
   function appendUserMessage(text) {
     const chatBox = document.getElementById("chat-box");
     const msgId = `user-msg-${++userMessageSeq}`;
@@ -363,10 +368,12 @@
     msg.id = msgId;
     msg.innerHTML = `
       <div class="avatar">🙋‍♂️</div>
-      <div>
-        <div class="chat-bubble">${preserveWhitespace(text)}</div>
-        <div class="user-action-area">
-          <button class="action-btn" title="메시지 편집" onclick="editUserMessage('${msgId}', '${text.replace(/'/g, "\\'").replace(/\n/g, "\\n").replace(/<[^>]+>/g, "")}')">✏️</button>
+      <div style="position:relative;">
+        <div class="chat-bubble">
+          ${preserveWhitespace(text)}
+          <div class="bubble-action-user">
+            <button class="action-btn" title="메시지 편집" onclick="editUserMessage('${msgId}', '${text.replace(/'/g, "\\'").replace(/\n/g, "\\n").replace(/<[^>]+>/g, "")}')">✏️</button>
+          </div>
         </div>
       </div>
     `;
@@ -374,17 +381,16 @@
     scrollToBottom();
   }
 
-  // 챗봇(봇) 메시지에 3개 액션 버튼
   function appendBotMessage(text, originalQuestion) {
     const chatBox = document.getElementById("chat-box");
     const msg = document.createElement("div");
     msg.className = "chat-message bot";
     msg.innerHTML = `
       <div class="avatar">🤖</div>
-      <div>
+      <div style="position:relative;">
         <div class="chat-bubble">
           ${preserveWhitespace(text)}
-          <div class="bot-action-area">
+          <div class="bubble-action-bot">
             <button class="action-btn" title="복사" onclick="copyToClipboard('${text.replace(/'/g, "\\'").replace(/\n/g, "\\n").replace(/<br>/g, "\\n").replace(/<[^>]+>/g, "")}')">📋</button>
             <button class="action-btn" title="음성 읽기" onclick="speakText('${text.replace(/'/g, "\\'").replace(/\n/g, "\\n").replace(/<br>/g, "\\n").replace(/<[^>]+>/g, "")}')">🔊</button>
             <button class="action-btn" title="응답 재생성" onclick="regenerateResponse('${originalQuestion ? originalQuestion.replace(/'/g, "\\'") : ''}')">🔄</button>
@@ -502,9 +508,12 @@
 
       clearTimeout(loadingTimer);
 
+      // 수정: 중복 appendBotMessage 방지! (stream이 끝난 뒤에만 한 번만 실행)
       if (loadingMessage) {
         const cancelBtn = loadingMessage.querySelector('.cancel-x');
         if (cancelBtn) cancelBtn.remove();
+        // 기존 stream에서 만든 currentText 사용, 원래 질문도 넘김
+        loadingMessage.parentNode.removeChild(loadingMessage);
         appendBotMessage(currentText, input);
         loadingMessage = null;
       }
