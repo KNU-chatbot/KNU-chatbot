@@ -35,7 +35,7 @@
       flex-direction: column;
       gap: 12px;
     }
-    .chat-message { display: flex; align-items: flex-end; max-width: 100%; }
+    .chat-message { display: flex; align-items: flex-start; max-width: 100%; }
     .chat-message.user {
       justify-content: flex-end;
       flex-direction: row-reverse;
@@ -45,7 +45,7 @@
     .chat-bubble {
       background: #f2f2f2;
       border-radius: 12px;
-      padding: 12px 18px 28px 18px;
+      padding: 12px 18px 12px 18px;
       max-width: 70%;
       word-break: break-word;
       font-size: 15px;
@@ -53,16 +53,37 @@
       color: #222;
       position: relative;
       min-width: 60px;
+      box-sizing: border-box;
     }
     .chat-message.user .chat-bubble {
       background: #e1f0ff;
       margin-left: auto;
       margin-right: 0;
       text-align: left;
+      padding-bottom: 10px; /* 액션버튼 공간만 최소로 */
     }
     .chat-message.user .avatar { margin-left: 8px; margin-right: 0; }
-    .chat-message.bot .avatar { margin-right: 8px; margin-left: 0; }
-    .avatar { font-size: 22px; user-select: none; }
+    .chat-message.bot .avatar-bot {
+      position: absolute;
+      top: -8px;
+      left: -36px;
+      font-size: 22px;
+      background: #fff;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      z-index: 1;
+      box-shadow: none;
+      /* 자연스럽게 겹치지 않도록 */
+    }
+    .bot-bubble-container {
+      position: relative;
+      display: flex;
+      align-items: flex-start;
+    }
     .bot-intro { background-color: #e0e0e0 !important; font-weight: bold; padding: 10px 12px 10px 10px !important; }
     .input-area {
       position: fixed;
@@ -142,7 +163,6 @@
       header, .header-inner { max-width: 100vw !important; }
     }
     textarea:disabled, button:disabled { opacity: 0.5; cursor: not-allowed; }
-    /* ==== 마이크 버튼 동그랗고 효과 적용 ==== */
     #voice-btn {
       border-radius: 50%;
       transition: background 0.18s, border 0.18s;
@@ -168,7 +188,6 @@
       70% { box-shadow: 0 0 0 10px #f75c4400; }
       100% { box-shadow: 0 0 0 0 #f75c4400; }
     }
-    /* ====== 액션 버튼 ====== */
     .action-btn {
       background: none;
       border: none;
@@ -186,17 +205,15 @@
     }
     .bubble-action-user {
       position: absolute;
-      bottom: 5px;
-      right: 10px;
-      margin-top: 8px;
+      bottom: 2px;
+      right: 8px;
       display: flex;
       gap: 4px;
     }
     .bubble-action-bot {
       position: absolute;
-      bottom: 5px;
-      left: 10px;
-      margin-top: 8px;
+      bottom: 2px;
+      left: 8px;
       display: flex;
       gap: 4px;
     }
@@ -264,22 +281,22 @@
     }
   }
 
-  // 응답 재생성(🔄) - 해당 챗봇 메시지 이후 모두 삭제 후 재생성
+  // 응답 재생성(🔄) - 그 챗봇 메시지 "포함" 이후 모두 삭제 후 재생성
   function regenerateResponse(botMsgId, originalQuestion) {
-    removeMessagesAfter(botMsgId);
+    removeMessagesAfterInclusive(botMsgId);
     sendMessage(originalQuestion);
   }
 
-  // 사용자 메시지 편집(✏️) - 해당 메시지 이후 모두 삭제 후 입력창 복원
+  // 사용자 메시지 편집(✏️) - 그 메시지 "포함" 이후 모두 삭제 후 입력창 복원
   function editUserMessage(userMsgId, text) {
-    removeMessagesAfter(userMsgId);
+    removeMessagesAfterInclusive(userMsgId);
     const inputElem = document.getElementById("user-input");
     inputElem.value = text.replace(/<br>/g, "\n").replace(/<[^>]+>/g, "");
     inputElem.focus();
   }
 
-  // 해당 id 이후의 모든 메시지 삭제(자기 자신 포함X, 이후만)
-  function removeMessagesAfter(msgId) {
+  // 해당 id "자기 자신 포함" 이후 모두 삭제
+  function removeMessagesAfterInclusive(msgId) {
     const chatBox = document.getElementById("chat-box");
     let found = false;
     const toRemove = [];
@@ -288,6 +305,11 @@
       if (child.id === msgId) found = true;
     });
     toRemove.forEach(node => chatBox.removeChild(node));
+    // 자기 자신도 삭제해야 하므로 found가 false인 경우(맨 마지막)도 체크
+    if (!found) {
+      const node = document.getElementById(msgId);
+      if (node) chatBox.removeChild(node);
+    }
   }
 
   function preserveWhitespace(text) {
@@ -350,8 +372,10 @@
     const intro = document.createElement("div");
     intro.className = "chat-message bot";
     intro.innerHTML = `
-      <div class="avatar">🤖</div>
-      <div class="chat-bubble bot-intro">⚡ 무엇이든 물어보세요! 경북대학교 전기공학과 챗봇입니다.</div>
+      <div class="bot-bubble-container">
+        <span class="avatar-bot">🤖</span>
+        <div class="chat-bubble bot-intro">⚡ 무엇이든 물어보세요! 경북대학교 전기공학과 챗봇입니다.</div>
+      </div>
     `;
     chatBox.appendChild(intro);
     scrollToBottom();
@@ -406,8 +430,8 @@
     msg.className = "chat-message bot";
     msg.id = msgId;
     msg.innerHTML = `
-      <div class="avatar">🤖</div>
-      <div style="position:relative; width:100%;">
+      <div class="bot-bubble-container">
+        <span class="avatar-bot">🤖</span>
         <div class="chat-bubble">
           ${preserveWhitespace(text)}
           <div class="bubble-action-bot">
@@ -478,8 +502,10 @@
       loadingMessage.className = "chat-message bot";
       loadingMessage.id = "loading-bot-msg";
       loadingMessage.innerHTML = `
-        <div class="avatar">🤖</div>
-        <div class="chat-bubble"><span class="loading-dots"><span>.</span><span>.</span><span>.</span></span></div>
+        <div class="bot-bubble-container">
+          <span class="avatar-bot">🤖</span>
+          <div class="chat-bubble"><span class="loading-dots"><span>.</span><span>.</span><span>.</span></span></div>
+        </div>
         <span class="cancel-x" title="취소하기" onclick="cancelRequest()">❎</span>
       `;
       chatBox.appendChild(loadingMessage);
@@ -530,7 +556,6 @@
 
       clearTimeout(loadingTimer);
 
-      // stream 끝난 뒤 loading 제거하고, appendBotMessage로 한 번만!
       if (loadingMessage && loadingMessage.parentNode) {
         const cancelBtn = loadingMessage.querySelector('.cancel-x');
         if (cancelBtn) cancelBtn.remove();
