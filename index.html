@@ -33,10 +33,9 @@
       padding: 24px 0;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 16px;
     }
 
-    /* ==== 말풍선 & 아바타 레이아웃 ==== */
     .chat-message {
       display: flex;
       max-width: 100%;
@@ -53,30 +52,24 @@
       text-align: left;
       align-items: flex-start;
     }
-
-    /* 챗봇 아바타(왼쪽 위) + 말풍선 정렬 */
     .chat-message.bot .avatar {
       margin-right: 8px;
       margin-left: 0;
       align-self: flex-start;
-      /* 아바타를 말풍선의 top에 맞추기 */
     }
-    /* 사용자 아바타(오른쪽 아래) */
     .chat-message.user .avatar {
       margin-left: 8px;
       margin-right: 0;
       align-self: flex-end;
     }
-
     .avatar { font-size: 22px; user-select: none; }
 
-    /* === 말풍선 스타일 (여백 문제 해결) === */
     .chat-bubble {
       background: #f2f2f2;
       border-radius: 12px;
       padding: 12px 18px 28px 18px;
-      display: inline-block;        /* 핵심: 텍스트 길이만큼만 너비 자동 */
-      max-width: 70%;               /* 기존대로 유지 */
+      display: inline-block;
+      max-width: 70%;
       min-width: 60px;
       word-break: break-word;
       font-size: 15px;
@@ -91,11 +84,16 @@
       margin-left: auto;
       margin-right: 0;
       text-align: left;
-      display: inline-block;        /* 사용자도 동일하게 */
+      display: inline-block;
       max-width: 70%;
     }
-    .bot-intro { background-color: #e0e0e0 !important; font-weight: bold; padding: 10px 12px 10px 10px !important; }
-
+    .bot-intro {
+      background-color: #e0e0e0 !important;
+      font-weight: bold;
+      padding: 10px 12px 10px 10px !important;
+      max-width: 90% !important;
+      display: inline-block !important;
+    }
     /* ====== 액션 버튼 ====== */
     .bubble-action-user {
       position: absolute;
@@ -126,8 +124,6 @@
       vertical-align: middle;
     }
     .action-btn:hover { background: #eaeaea; }
-
-    /* 이하 기존 코드 동일 */
     .input-area {
       position: fixed;
       left: 0;
@@ -206,7 +202,6 @@
       header, .header-inner { max-width: 100vw !important; }
     }
     textarea:disabled, button:disabled { opacity: 0.5; cursor: not-allowed; }
-    /* ==== 마이크 버튼 동그랗고 효과 적용 ==== */
     #voice-btn {
       border-radius: 50%;
       transition: background 0.18s, border 0.18s;
@@ -297,7 +292,6 @@
   }
 
   // ====== 편집/재생성 시 해당 메시지 '포함' 이후 모두 삭제 ======
-
   function removeMessagesAfter(msgId) {
     const chatBox = document.getElementById("chat-box");
     let found = false;
@@ -308,11 +302,12 @@
     });
     toRemove.forEach(node => chatBox.removeChild(node));
   }
-
-  // 재생성: 해당 메시지 '포함' 이후 모두 삭제 후, 다시 응답(재질문 X)
+  // 재생성: 해당 메시지 '포함' 이후 모두 삭제 후, 다시 응답(중복 질문 X)
   function regenerateResponse(botMsgId, originalQuestion) {
+    // 해당 챗봇 메시지 포함 이후 모두 삭제
     removeMessagesAfter(botMsgId);
-    sendMessage(originalQuestion); // 재질문 X, 기존 메시지 하나만 생성
+    // 바로 챗봇 응답만 다시 생성(질문 중복 없음)
+    sendMessage(originalQuestion, true);
   }
   // 편집: 해당 메시지 '포함' 이후 모두 삭제, 입력창에 복원
   function editUserMessage(userMsgId, text) {
@@ -496,13 +491,18 @@
     fileInput.value = "";
   }
 
-  async function sendMessage(customInput) {
+  // sendMessage 수정: isRegenerate 플래그로 중복질문 방지
+  async function sendMessage(customInput, isRegenerate = false) {
     const inputElem = document.getElementById("user-input");
     const input = customInput || inputElem.value.trim();
     if (input === "") return;
 
-    const userMsgId = appendUserMessage(input);
-    if (!customInput) inputElem.value = "";
+    let userMsgId;
+    // 재질문 상황이 아니라면 사용자 메시지 출력
+    if (!isRegenerate) {
+      userMsgId = appendUserMessage(input);
+      if (!customInput) inputElem.value = "";
+    }
 
     showLoading();
 
