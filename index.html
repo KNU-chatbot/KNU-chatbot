@@ -76,9 +76,12 @@
       vertical-align: top;
       box-sizing: border-box;
     }
+    .chat-bubble.error {  /* 에러/알림 말풍선만 아래 패딩 줄임 */
+      padding-bottom: 12px !important;
+    }
     .chat-message.user .chat-bubble {
       background: #e1f0ff;
-      margin-left: auto; /* 핵심! */
+      margin-left: auto;
       margin-right: 0;
       text-align: left;
       display: inline-block;
@@ -225,6 +228,16 @@
       0% { box-shadow: 0 0 0 0 #f75c4477; }
       70% { box-shadow: 0 0 0 10px #f75c4400; }
       100% { box-shadow: 0 0 0 0 #f75c4400; }
+    }
+    /* ====== 로딩 말풍선 커스텀 ====== */
+    .chat-bubble.loading {
+      display: flex !important;
+      justify-content: center !important;
+      align-items: center !important;
+      min-width: 60px;
+      min-height: 40px;
+      padding: 12px 18px !important;
+      background: #f2f2f2;
     }
   </style>
 </head>
@@ -401,7 +414,6 @@
   function appendUserMessage(text) {
     const chatBox = document.getElementById("chat-box");
     const msgId = `user-msg-${++userMessageSeq}`;
-    // 불필요한 래퍼 div 제거!
     msg = document.createElement("div");
     msg.className = "chat-message user";
     msg.id = msgId;
@@ -422,18 +434,26 @@
   function appendBotMessage(text, originalQuestion) {
     const chatBox = document.getElementById("chat-box");
     const msgId = `bot-msg-${++botMessageSeq}`;
+    // 에러/실패 메시지에만 버튼 안나오게 + 아래 패딩 줄임
+    const isError = (
+      text.includes("서버 연결에 실패했어요") ||
+      text.includes("파일 업로드에 실패했어요") ||
+      text.includes("오류가 발생했어요")
+    );
     msg = document.createElement("div");
     msg.className = "chat-message bot";
     msg.id = msgId;
     msg.innerHTML = `
       <div class="avatar">🤖</div>
-      <div class="chat-bubble">
+      <div class="chat-bubble${isError ? " error" : ""}">
         ${preserveWhitespace(text)}
-        <div class="bubble-action-bot">
-          <button class="action-btn" title="복사" onclick="copyToClipboard('${text.replace(/'/g, "\\'").replace(/\n/g, "\\n").replace(/<br>/g, "\\n").replace(/<[^>]+>/g, "")}')">📋</button>
-          <button class="action-btn" title="음성 읽기" onclick="speakText('${text.replace(/'/g, "\\'").replace(/\n/g, "\\n").replace(/<br>/g, "\\n").replace(/<[^>]+>/g, "")}')">🔊</button>
-          <button class="action-btn" title="응답 재생성" onclick="regenerateResponse('${msgId}', '${originalQuestion ? originalQuestion.replace(/'/g, "\\'") : ''}')">🔄</button>
-        </div>
+        ${!isError ? `
+          <div class="bubble-action-bot">
+            <button class="action-btn" title="복사" onclick="copyToClipboard('${text.replace(/'/g, "\\'").replace(/\n/g, "\\n").replace(/<br>/g, "\\n").replace(/<[^>]+>/g, "")}')">📋</button>
+            <button class="action-btn" title="음성 읽기" onclick="speakText('${text.replace(/'/g, "\\'").replace(/\n/g, "\\n").replace(/<br>/g, "\\n").replace(/<[^>]+>/g, "")}')">🔊</button>
+            <button class="action-btn" title="응답 재생성" onclick="regenerateResponse('${msgId}', '${originalQuestion ? originalQuestion.replace(/'/g, "\\'") : ''}')">🔄</button>
+          </div>
+        ` : ""}
       </div>
     `;
     chatBox.appendChild(msg);
@@ -500,7 +520,7 @@
       loadingMessage.id = "loading-bot-msg";
       loadingMessage.innerHTML = `
         <div class="avatar">🤖</div>
-        <div class="chat-bubble"><span class="loading-dots"><span>.</span><span>.</span><span>.</span></span></div>
+        <div class="chat-bubble loading"><span class="loading-dots"><span>.</span><span>.</span><span>.</span></span></div>
         <span class="cancel-x" title="취소하기" onclick="cancelRequest()">❎</span>
       `;
       chatBox.appendChild(loadingMessage);
@@ -535,6 +555,7 @@
             const data = part.replace(/^data:\s*/, "");
             if (isFirst && loadingMessage && loadingMessage.parentNode) {
               const bubble = loadingMessage.querySelector(".chat-bubble");
+              bubble.classList.remove('loading'); // 로딩 끝나면 클래스 제거 (말풍선 원상복구)
               bubble.innerHTML = "";
               chatBubble = bubble;
               isFirst = false;
