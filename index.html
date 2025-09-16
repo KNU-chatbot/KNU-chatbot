@@ -536,48 +536,62 @@
         signal: controller.signal
       });
 
-      const reader = response.body.getReader();
-      streamReader = reader;
-      const decoder = new TextDecoder("utf-8");
-      let buffer = "";
-      let isFirst = true;
-      let chatBubble = null;
-      let currentText = "";
+      // fetch 응답 직후 ~ clearTimeout 전까지의 스트림 처리 부분을 이걸로 교체
+const reader = response.body.getReader();
+streamReader = reader;
+const decoder = new TextDecoder("utf-8");
+let buffer = "";
+let isFirst = true;
+let chatBubble = null;
+let currentText = "";
 
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        buffer += decoder.decode(value, { stream: true });
-        let parts = buffer.split("\n");
-        buffer = parts.pop();
-        for (const part of parts) {
-          if (part.startsWith("data:")) {
-            const jsonData = part.replace(/^data:\s*/, ""); // 캡슐(JSON 문자열) 가져오기
-            try {
-              const parsedData = JSON.parse(jsonData); // 캡슐 열기 (JSON 파싱)
-              const textChunk = parsedData.text;      // 쪽지(실제 텍스트) 꺼내기
+// SSE는 보통 이벤트 사이가 빈 줄(\n\n)로 구분됩니다.
+while (true) {
+  const { done, value } = await reader.read();
+  if (done) break;
+  buffer += decoder.decode(value, { stream: true });
 
-              if (isFirst && loadingMessage && loadingMessage.parentNode) {
-                const bubble = loadingMessage.querySelector(".chat-bubble");
-                bubble.classList.remove('loading');
-                bubble.innerHTML = "";
-                chatBubble = bubble;
-                isFirst = false;
-                currentText = "";
-              }
+  // 이벤트 경계로 자르기
+  let events = buffer.split("\n\n");
+  buffer = events.pop(); // 마지막은 다음 chunk와 이어질 수 있으니 버퍼로 남김
 
-              if (chatBubble && textChunk) {
-                currentText += textChunk; // 쪽지 내용만 글자에 더함
-                chatBubble.innerHTML = preserveWhitespace(currentText);
-                scrollToBottom();
-              }
-            } catch (error) {
-              // JSON 파싱 중 에러가 발생하면 무시하고 다음 청크로 넘어감
-              console.error("JSON parsing error:", error);
-            }
-          }
-        }
+  for (const evt of events) {
+    // 한 이벤트 안에서 data: 라인만 추출
+    const lines = evt.split("\n");
+    for (const line of lines) {
+      if (!line.startsWith("data:")) continue;
+      let payload = line.slice(5).trim(); // 'data:' 제거
+
+      if (payload === "[DONE]") continue; // 백엔드에서 보낼 수 있는 종료 신호 대비
+
+      // 1) JSON 포맷 시도
+      let textChunk = "";
+      try {
+        const parsed = JSON.parse(payload); // {"text":"..."} 또는 {"delta":"..."} 등
+        textChunk = parsed.text ?? parsed.delta ?? "";
+      } catch {
+        // 2) JSON 아니면 순수 텍스트로 간주
+        textChunk = payload;
       }
+
+      if (isFirst && loadingMessage && loadingMessage.parentNode) {
+        const bubble = loadingMessage.querySelector(".chat-bubble");
+        bubble.classList.remove("loading");
+        bubble.innerHTML = "";
+        chatBubble = bubble;
+        isFirst = false;
+        currentText = "";
+      }
+
+      if (chatBubble && textChunk) {
+        currentText += textChunk;
+        chatBubble.innerHTML = preserveWhitespace(currentText);
+        scrollToBottom();
+      }
+    }
+  }
+}
+
 
       clearTimeout(loadingTimer);
 
