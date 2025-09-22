@@ -9,9 +9,10 @@
     body { min-height: 100dvh; height: 100dvh; display: flex; flex-direction: column; }
     header { position: fixed; top: 0; left: 0; width: 100%; z-index: 10; background: #fff; padding: 20px 0 10px 0; border-bottom: 1px solid #eee; display: flex; align-items: center; justify-content: center; box-sizing: border-box; }
     .header-inner { width: 100%; max-width: 850px; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; box-sizing: border-box; }
-    .header-title { display: flex; align-items: center; }
+    .header-title { display: flex; align-items: center; gap: 8px; }
     h1 { font-size: 20px; color: #222; margin: 0; display: inline-block; }
     .logo { width: 40px; margin-right: 12px; }
+    #id-badge { color:#666; font-size:12px; }
     #reset-btn { background: none; border: none; font-size: 18px; cursor: pointer; color: #888; }
     #reset-btn:hover { color: #222; }
     .container {
@@ -35,10 +36,7 @@
       flex-direction: column;
       gap: 12px;
     }
-    .chat-message {
-      display: flex;
-      max-width: 100%;
-    }
+    .chat-message { display: flex; max-width: 100%; }
     .chat-message.user {
       width: 100%;
       justify-content: flex-end;
@@ -50,16 +48,8 @@
       flex-direction: row;
       align-items: flex-start;
     }
-    .chat-message.bot .avatar {
-      margin-right: 8px;
-      margin-left: 0;
-      align-self: flex-start;
-    }
-    .chat-message.user .avatar {
-      margin-left: 8px;
-      margin-right: 0;
-      align-self: flex-end;
-    }
+    .chat-message.bot .avatar { margin-right: 8px; margin-left: 0; align-self: flex-start; }
+    .chat-message.user .avatar { margin-left: 8px; margin-right: 0; align-self: flex-end; }
     .avatar { font-size: 22px; user-select: none; }
     .chat-bubble {
       background: #f2f2f2;
@@ -76,91 +66,30 @@
       vertical-align: top;
       box-sizing: border-box;
     }
-    .chat-bubble.error {  /* 에러/알림 말풍선만 아래 패딩 줄임 */
-      padding-bottom: 12px !important;
-    }
-    .chat-message.user .chat-bubble {
-      background: #e1f0ff;
-      margin-left: auto;
-      margin-right: 0;
-      text-align: left;
-      display: inline-block;
-      max-width: 70%;
-    }
-    .bot-intro {
-      background-color: #e0e0e0 !important;
-      font-weight: bold;
-      padding: 10px 12px 10px 10px !important;
-      max-width: 48% !important;
-      width: 100% !important;
-      display: block !important;
-      box-sizing: border-box;
-    }
-    /* ====== 액션 버튼 ====== */
+    .chat-bubble.error { padding-bottom: 12px !important; }
+    .chat-message.user .chat-bubble { background: #e1f0ff; margin-left: auto; margin-right: 0; text-align: left; max-width: 70%; }
+    .bot-intro { background-color: #e0e0e0 !important; font-weight: bold; padding: 10px 12px 10px 10px !important; max-width: 48% !important; width: 100% !important; display: block !important; box-sizing: border-box; }
+
     .bubble-action-user {
-      position: absolute;
-      bottom: 5px;
-      right: 10px;
-      margin-top: 8px;
-      display: flex;
-      gap: 4px;
+      position: absolute; bottom: 5px; right: 10px; margin-top: 8px; display: flex; gap: 4px;
     }
     .bubble-action-bot {
-      position: absolute;
-      bottom: 5px;
-      left: 10px;
-      margin-top: 8px;
-      display: flex;
-      gap: 4px;
+      position: absolute; bottom: 5px; left: 10px; margin-top: 8px; display: flex; gap: 4px;
     }
-    .action-btn {
-      background: none;
-      border: none;
-      cursor: pointer;
-      font-size: 15px;
-      padding: 2px;
-      border-radius: 50%;
-      transition: background 0.13s;
-      line-height: 1;
-      margin: 0 0 0 2px;
-      vertical-align: middle;
-    }
+    .action-btn { background: none; border: none; cursor: pointer; font-size: 15px; padding: 2px; border-radius: 50%; transition: background 0.13s; line-height: 1; margin: 0 0 0 2px; vertical-align: middle; }
     .action-btn:hover { background: #eaeaea; }
+
     .input-area {
-      position: fixed;
-      left: 0;
-      bottom: 0;
-      width: 100%;
-      z-index: 11;
-      border-top: 1px solid #eee;
-      background: #fff;
-      padding: 16px 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      position: fixed; left: 0; bottom: 0; width: 100%; z-index: 11; border-top: 1px solid #eee; background: #fff; padding: 16px 0; display: flex; justify-content: center; align-items: center;
     }
-    .input-area-inner {
-      width: 100%; max-width: 850px; display: flex; align-items: center;
-    }
+    .input-area-inner { width: 100%; max-width: 850px; display: flex; align-items: center; }
     .file-upload-btn {
-      border: none;
-      background: #e1f0ff;
-      border-radius: 8px;
-      padding: 0;
-      font-size: 15px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 40px; height: 40px;
-      transition: background 0.18s;
-      margin-right: 5px;
+      border: none; background: #e1f0ff; border-radius: 8px; padding: 0; font-size: 15px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; transition: background 0.18s; margin-right: 5px;
     }
     .file-upload-btn:hover { background: #b7d6fa; }
     .file-icon {
-      display: inline-block;
-      width: 22px; height: 22px;
-      background: none;
+      display: inline-block; width: 22px; height: 22px; background: none;
       mask: url('data:image/svg+xml;utf8,<svg fill="none" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7.757 16.243a4 4 0 0 1 0-5.657l5.657-5.657a4 4 0 0 1 5.657 5.657l-7.07 7.071a2 2 0 1 1-2.829-2.829l7.07-7.071" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>') center / contain no-repeat;
       -webkit-mask: url('data:image/svg+xml;utf8,<svg fill="none" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7.757 16.243a4 4 0 0 1 0-5.657l5.657-5.657a4 4 0 0 1 5.657 5.657l-7.07 7.071a2 2 0 1 1-2.829-2.829l7.07-7.071" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>') center / contain no-repeat;
       background-color: #1a4fa4;
@@ -168,24 +97,10 @@
     #file-upload { display:none; }
     #file-name-display { font-size: 13px; color: #888; margin-right: 6px; }
     #user-input {
-      flex: 1;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      font-size: 15px;
-      padding: 12px;
-      resize: none;
-      margin-right: 10px;
-      min-width: 0;
+      flex: 1; border: 1px solid #ccc; border-radius: 8px; font-size: 15px;
+      padding: 12px; resize: none; margin-right: 10px; min-width: 0;
     }
-    #send-btn {
-      background: #111;
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      padding: 10px 18px;
-      font-size: 15px;
-      cursor: pointer;
-    }
+    #send-btn { background: #111; color: #fff; border: none; border-radius: 8px; padding: 10px 18px; font-size: 15px; cursor: pointer; }
     #send-btn:hover { background: #444; }
     .cancel-x { color: red; margin-left: 8px; cursor: pointer; font-weight: bold; user-select: none; font-size: 18px; align-self: center; }
     .cancel-x:hover { color: darkred; }
@@ -195,6 +110,7 @@
     .loading-dots span:nth-child(2) { animation-delay: 0.15s; }
     .loading-dots span:nth-child(3) { animation-delay: 0.3s; }
     @keyframes bounceDot { 0%, 80%, 100% { transform: translateY(0); } 30% { transform: translateY(-8px); } 50% { transform: translateY(0); } }
+
     .recommend-box { position: fixed; top: 120px; left: calc(50% + 425px + 32px); display: flex; flex-direction: column; gap: 10px; z-index: 1000; }
     .recommend-btn { background-color: #f7f7f7; color: #111; border: 1px solid #ccc; border-radius: 6px; padding: 8px 12px; font-size: 14px; cursor: pointer; text-align: left; }
     .recommend-btn:hover { background-color: #eee; }
@@ -204,41 +120,29 @@
       header, .header-inner { max-width: 100vw !important; }
     }
     textarea:disabled, button:disabled { opacity: 0.5; cursor: not-allowed; }
-    #voice-btn {
-      border-radius: 50%;
-      transition: background 0.18s, border 0.18s;
-    }
+
+    #voice-btn { border-radius: 50%; transition: background 0.18s, border 0.18s; }
     #voice-btn[aria-pressed="true"] {
-      background: #f75c44 !important;
-      border: 2px solid #f75c44;
-      animation: mic-pulse 1s infinite;
+      background: #f75c44 !important; border: 2px solid #f75c44; animation: mic-pulse 1s infinite;
     }
-    #voice-btn[aria-pressed="true"] svg rect,
-    #voice-btn[aria-pressed="true"] svg path {
-      stroke: #fff !important;
-      transition: stroke 0.1s;
-    }
-    #voice-btn svg rect,
-    #voice-btn svg path {
-      stroke: #111;
-      stroke-width: 2;
-      transition: stroke 0.1s;
-    }
-    @keyframes mic-pulse {
-      0% { box-shadow: 0 0 0 0 #f75c4477; }
-      70% { box-shadow: 0 0 0 10px #f75c4400; }
-      100% { box-shadow: 0 0 0 0 #f75c4400; }
-    }
-    /* ====== 로딩 말풍선 커스텀 ====== */
+    #voice-btn[aria-pressed="true"] svg rect, #voice-btn[aria-pressed="true"] svg path { stroke: #fff !important; transition: stroke 0.1s; }
+    #voice-btn svg rect, #voice-btn svg path { stroke: #111; stroke-width: 2; transition: stroke 0.1s; }
+    @keyframes mic-pulse { 0% { box-shadow: 0 0 0 0 #f75c4477; } 70% { box-shadow: 0 0 0 10px #f75c4400; } 100% { box-shadow: 0 0 0 0 #f75c4400; } }
+
     .chat-bubble.loading {
-      display: flex !important;
-      justify-content: center !important;
-      align-items: center !important;
-      min-width: 60px;
-      min-height: 40px;
-      padding: 12px 18px !important;
-      background: #f2f2f2;
+      display: flex !important; justify-content: center !important; align-items: center !important;
+      min-width: 60px; min-height: 40px; padding: 12px 18px !important; background: #f2f2f2;
     }
+
+    /* 세션 목록 사이드바 */
+    #session-list {
+      position: fixed; top: 120px; left: calc(50% - 425px - 252px);
+      width: 220px; max-height: 70vh; overflow:auto; border:1px solid #eee; border-radius:8px; padding:8px; background:#fff; display:none; z-index: 9;
+    }
+    #session-items { display:flex; flex-direction:column; gap:6px; }
+    .session-item { text-align:left; border:1px solid #ddd; background:#f7f7f7; border-radius:6px; padding:6px; cursor:pointer; }
+    .session-item:hover { background:#eee; }
+    @media (max-width: 1200px) { #session-list { display:none !important; } }
   </style>
 </head>
 <body>
@@ -247,19 +151,29 @@
       <div class="header-title">
         <img alt="KNU 로고" class="logo" src="knu_logo.jpg"/>
         <h1>경북대학교 전기공학과 챗봇</h1>
+        <small id="id-badge"></small>
       </div>
       <button id="reset-btn" title="채팅 초기화">🗑️</button>
     </div>
   </header>
+
+  <!-- 세션 목록(최근 5개) -->
+  <div id="session-list">
+    <div style="font-weight:600; margin-bottom:6px;">최근 대화</div>
+    <div id="session-items"></div>
+  </div>
+
   <div class="recommend-box">
     <button class="recommend-btn" onclick="sendRecommendedQuestion('졸업 요건이 어떻게 되나요?')">🎓 졸업 요건</button>
     <button class="recommend-btn" onclick="sendRecommendedQuestion('교수님 이메일은 어디서 확인해요?')">📬 교수님 이메일</button>
     <button class="recommend-btn" onclick="sendRecommendedQuestion('교과 과정이 어떻게 되나요?')">📖 교과 과정</button>
     <button class="recommend-btn" onclick="sendRecommendedQuestion('공지사항은 어디서 확인해요?')">📢 공지사항</button>
   </div>
+
   <div class="container">
     <div id="chat-box"></div>
   </div>
+
   <div class="input-area">
     <div class="input-area-inner">
       <label for="file-upload" class="file-upload-btn" title="파일 업로드">
@@ -279,18 +193,32 @@
       <button id="send-btn" onclick="sendMessage()">➤</button>
     </div>
   </div>
+
 <script>
-  const sessionId = crypto.randomUUID();
+  // ====== 환경 ======
+  const BACKEND_URL = "https://knu-chatbot-backend-docker.onrender.com";
+
+  // ====== user_id 영구 보관 및 세션 관리 ======
+  const storedUserId = localStorage.getItem('knu_user_id');
+  const userId = storedUserId || crypto.randomUUID();
+  if (!storedUserId) localStorage.setItem('knu_user_id', userId);
+
+  let sessionId = crypto.randomUUID();
+
   let controller = null;
   let loadingMessage = null;
   let loadingTimer = null;
   let streamReader = null;
   let lastUploadedFileName = "";
 
+  function updateIdBadge() {
+    const el = document.getElementById('id-badge');
+    if (!el) return;
+    el.textContent = `user:${userId.slice(0,8)} · session:${sessionId.slice(0,8)}`;
+  }
+
   function copyToClipboard(text) {
-    navigator.clipboard.writeText(text).then(() => {
-      alert('복사되었습니다!');
-    });
+    navigator.clipboard.writeText(text).then(() => { alert('복사되었습니다!'); });
   }
   function speakText(text) {
     if ('speechSynthesis' in window) {
@@ -325,20 +253,12 @@
   }
 
   function preserveWhitespace(text) {
-    text = text
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;");
+    text = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
     text = text.replace(/((https?:\/\/|www\.)[^\s<>(){}\[\]'"]+[\w/#?&=~%@-])/g, function(url) {
-      let href = url;
-      if (url.startsWith("www.")) {
-        href = "http://" + url;
-      }
+      let href = url; if (url.startsWith("www.")) { href = "http://" + url; }
       return `<a href="${href}" target="_blank" rel="noopener noreferrer">${url}</a>`;
     });
-    text = text.replace(/ {2,}/g, function(space) {
-      return "&nbsp;".repeat(space.length);
-    });
+    text = text.replace(/ {2,}/g, function(space) { return "&nbsp;".repeat(space.length); });
     text = text.replace(/\n/g, "<br>");
     return text;
   }
@@ -365,6 +285,9 @@
 
   window.onload = function () {
     initChat();
+    updateIdBadge();
+    fetchSessions();
+
     const inputElem = document.getElementById("user-input");
     inputElem.addEventListener("keydown", function (event) {
       if (event.key === "Enter" && !event.shiftKey) {
@@ -373,7 +296,10 @@
       }
     });
     document.getElementById("reset-btn").addEventListener("click", () => {
+      sessionId = crypto.randomUUID(); // 새 대화
       initChat();
+      updateIdBadge();
+      fetchSessions();
     });
     document.getElementById("file-upload").addEventListener("change", handleFileUpload);
   };
@@ -414,7 +340,7 @@
   function appendUserMessage(text) {
     const chatBox = document.getElementById("chat-box");
     const msgId = `user-msg-${++userMessageSeq}`;
-    msg = document.createElement("div");
+    const msg = document.createElement("div");
     msg.className = "chat-message user";
     msg.id = msgId;
     msg.innerHTML = `
@@ -434,13 +360,12 @@
   function appendBotMessage(text, originalQuestion) {
     const chatBox = document.getElementById("chat-box");
     const msgId = `bot-msg-${++botMessageSeq}`;
-    // 에러/실패 메시지에만 버튼 안나오게 + 아래 패딩 줄임
     const isError = (
       text.includes("서버 연결에 실패했어요") ||
       text.includes("파일 업로드에 실패했어요") ||
       text.includes("오류가 발생했어요")
     );
-    msg = document.createElement("div");
+    const msg = document.createElement("div");
     msg.className = "chat-message bot";
     msg.id = msgId;
     msg.innerHTML = `
@@ -461,6 +386,7 @@
     return msgId;
   }
 
+  // ====== 파일 업로드 ======
   async function handleFileUpload(event) {
     const fileInput = event.target;
     const file = fileInput.files[0];
@@ -474,17 +400,12 @@
     }
 
     showLoading();
-
     try {
       const formData = new FormData();
       formData.append("file", file);
       formData.append("session_id", sessionId);
 
-      const response = await fetch("https://knu-chatbot-backend-docker.onrender.com/upload", {
-        method: "POST",
-        body: formData,
-      });
-
+      const response = await fetch(`${BACKEND_URL}/upload`, { method: "POST", body: formData });
       if (!response.ok) throw new Error("파일 업로드 실패!");
 
       const result = await response.json();
@@ -495,11 +416,87 @@
       document.getElementById("file-name-display").textContent = "";
       appendBotMessage("⚠️ 파일 업로드에 실패했어요. 다시 시도해 주세요.");
     }
-
     hideLoading();
     fileInput.value = "";
   }
 
+  // ====== 히스토리 렌더링 ======
+  function clearChatExceptIntro() {
+    const chatBox = document.getElementById("chat-box");
+    chatBox.innerHTML = "";
+    const intro = document.createElement("div");
+    intro.className = "chat-message bot";
+    intro.innerHTML = `
+      <div class="avatar">🤖</div>
+      <div class="chat-bubble bot-intro">🗂️ 선택한 대화의 기록을 불러왔어요.</div>
+    `;
+    chatBox.appendChild(intro);
+  }
+
+  function renderHistory(historyArray) {
+    clearChatExceptIntro();
+    if (!Array.isArray(historyArray) || historyArray.length === 0) {
+      appendBotMessage("이 세션에는 표시할 대화가 없어요. 새로 질문해 주세요.");
+      return;
+    }
+    // 서버에서 오래된 순으로 주더라도 그대로 시간순으로 쌓이도록 처리
+    historyArray.forEach(item => {
+      const q = (item.question ?? "").toString();
+      const a = (item.answer ?? "").toString();
+      if (q) appendUserMessage(q);
+      if (a) appendBotMessage(a, q);
+    });
+  }
+
+  async function fetchHistory(targetSessionId) {
+    try {
+      const res = await fetch(`${BACKEND_URL}/history/${targetSessionId}`);
+      if (!res.ok) throw new Error();
+      const data = await res.json();
+      renderHistory(data.history || []);
+    } catch {
+      // 백엔드에 /history/{session_id}가 아직 없다면 폴백
+      initChat();
+      appendBotMessage("이전 대화로 전환했어요. 계속 질문해 주세요.");
+    }
+  }
+
+  // ====== 최근 세션 목록 불러오기 & 전환 ======
+  async function fetchSessions() {
+    try {
+      const res = await fetch(`${BACKEND_URL}/sessions/${userId}`);
+      if (!res.ok) throw new Error();
+      const data = await res.json();
+      const box = document.getElementById('session-list');
+      const items = document.getElementById('session-items');
+      items.innerHTML = "";
+
+      const sessions = (data.sessions || []);
+      if (sessions.length === 0) {
+        box.style.display = 'none';
+        return;
+      }
+      box.style.display = 'block';
+
+      sessions.forEach(s => {
+        const btn = document.createElement('button');
+        btn.className = 'session-item';
+        btn.textContent = s.title || s.session_id;
+        btn.title = s.session_id;
+        btn.onclick = () => {
+          sessionId = s.session_id; // 이 세션으로 전환
+          updateIdBadge();
+          fetchHistory(sessionId);  // ✅ 전환 즉시 히스토리 불러오기
+        };
+        items.appendChild(btn);
+      });
+    } catch {
+      const box = document.getElementById('session-list');
+      if (box) box.style.display = 'none';
+    }
+  }
+
+  // ====== 메시지 전송 & 스트리밍 수신(SSE) ======
   async function sendMessage(customInput, isRegenerate = false) {
     const inputElem = document.getElementById("user-input");
     const input = customInput || inputElem.value.trim();
@@ -529,69 +526,62 @@
       loadingTimer = setTimeout(() => { cancelRequest(); }, 30000);
 
       controller = new AbortController();
-      const response = await fetch("https://knu-chatbot-backend-docker.onrender.com/stream", {
+      const response = await fetch(`${BACKEND_URL}/stream`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ session_id: sessionId, question: input }),
+        body: JSON.stringify({ user_id: userId, session_id: sessionId, question: input }),
         signal: controller.signal
       });
 
-      // fetch 응답 직후 ~ clearTimeout 전까지의 스트림 처리 부분을 이걸로 교체
-const reader = response.body.getReader();
-streamReader = reader;
-const decoder = new TextDecoder("utf-8");
-let buffer = "";
-let isFirst = true;
-let chatBubble = null;
-let currentText = "";
+      const reader = response.body.getReader();
+      streamReader = reader;
+      const decoder = new TextDecoder("utf-8");
+      let buffer = "";
+      let isFirst = true;
+      let chatBubble = null;
+      let currentText = "";
 
-// SSE는 보통 이벤트 사이가 빈 줄(\n\n)로 구분됩니다.
-while (true) {
-  const { done, value } = await reader.read();
-  if (done) break;
-  buffer += decoder.decode(value, { stream: true });
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
 
-  // 이벤트 경계로 자르기
-  let events = buffer.split("\n\n");
-  buffer = events.pop(); // 마지막은 다음 chunk와 이어질 수 있으니 버퍼로 남김
+        let events = buffer.split("\n\n");
+        buffer = events.pop();
 
-  for (const evt of events) {
-    // 한 이벤트 안에서 data: 라인만 추출
-    const lines = evt.split("\n");
-    for (const line of lines) {
-      if (!line.startsWith("data:")) continue;
-      let payload = line.slice(5).trim(); // 'data:' 제거
+        for (const evt of events) {
+          const lines = evt.split("\n");
+          for (const line of lines) {
+            if (!line.startsWith("data:")) continue;
+            let payload = line.slice(5).trim();
 
-      if (payload === "[DONE]") continue; // 백엔드에서 보낼 수 있는 종료 신호 대비
+            if (payload === "[DONE]") continue;
 
-      // 1) JSON 포맷 시도
-      let textChunk = "";
-      try {
-        const parsed = JSON.parse(payload); // {"text":"..."} 또는 {"delta":"..."} 등
-        textChunk = parsed.text ?? parsed.delta ?? "";
-      } catch {
-        // 2) JSON 아니면 순수 텍스트로 간주
-        textChunk = payload;
+            let textChunk = "";
+            try {
+              const parsed = JSON.parse(payload);
+              textChunk = parsed.text ?? parsed.delta ?? "";
+            } catch {
+              textChunk = payload;
+            }
+
+            if (isFirst && loadingMessage && loadingMessage.parentNode) {
+              const bubble = loadingMessage.querySelector(".chat-bubble");
+              bubble.classList.remove("loading");
+              bubble.innerHTML = "";
+              chatBubble = bubble;
+              isFirst = false;
+              currentText = "";
+            }
+
+            if (chatBubble && textChunk) {
+              currentText += textChunk;
+              chatBubble.innerHTML = preserveWhitespace(currentText);
+              scrollToBottom();
+            }
+          }
+        }
       }
-
-      if (isFirst && loadingMessage && loadingMessage.parentNode) {
-        const bubble = loadingMessage.querySelector(".chat-bubble");
-        bubble.classList.remove("loading");
-        bubble.innerHTML = "";
-        chatBubble = bubble;
-        isFirst = false;
-        currentText = "";
-      }
-
-      if (chatBubble && textChunk) {
-        currentText += textChunk;
-        chatBubble.innerHTML = preserveWhitespace(currentText);
-        scrollToBottom();
-      }
-    }
-  }
-}
-
 
       clearTimeout(loadingTimer);
 
@@ -602,6 +592,9 @@ while (true) {
         appendBotMessage(currentText, input);
         loadingMessage = null;
       }
+
+      // 응답 후 세션 목록 갱신(새 세션의 첫 질문이면 목록에 반영)
+      fetchSessions();
     } catch (error) {
       clearTimeout(loadingTimer);
       if (loadingMessage && loadingMessage.parentNode) {
@@ -615,10 +608,9 @@ while (true) {
     hideLoading();
   }
 
-  function sendRecommendedQuestion(text) {
-    sendMessage(text);
-  }
+  function sendRecommendedQuestion(text) { sendMessage(text); }
 
+  // ====== 음성 입력 ======
   let recognizing = false;
   let recognition = null;
 
@@ -632,29 +624,22 @@ while (true) {
       recognizing = true;
       document.getElementById('voice-btn').setAttribute('aria-pressed', 'true');
     };
-
     recognition.onend = function() {
       recognizing = false;
       document.getElementById('voice-btn').setAttribute('aria-pressed', 'false');
     };
-
     recognition.onresult = function(event) {
       const transcript = event.results[0][0].transcript;
       document.getElementById('user-input').value = transcript;
       document.getElementById('user-input').focus();
     };
-
     recognition.onerror = function() {
       recognizing = false;
       document.getElementById('voice-btn').setAttribute('aria-pressed', 'false');
     };
 
     document.getElementById('voice-btn').onclick = function() {
-      if (recognizing) {
-        recognition.stop();
-      } else {
-        recognition.start();
-      }
+      if (recognizing) { recognition.stop(); } else { recognition.start(); }
     };
   } else {
     document.getElementById('voice-btn').onclick = function() {
