@@ -127,7 +127,8 @@
     }
     #voice-btn[aria-pressed="true"] svg rect, #voice-btn[aria-pressed="true"] svg path { stroke: #fff !important; transition: stroke 0.1s; }
     #voice-btn svg rect, #voice-btn svg path { stroke: #111; stroke-width: 2; transition: stroke 0.1s; }
-    @keyframes mic-pulse { 0% { box-shadow: 0 0 0 0 #f75c4477; } 70% { box-shadow: 0 0 0 10px #f75c4400; } 100% { box-shadow: 0 0 0 0 #f75c4400; } }
+    @keyframes mic-pulse { 0% { box-shadow: 0 0 0 0 #f75c4477; } 70% { box-shadow: 0 0 0 10px #f75c4400; } 100% { box-shadow: 0 0 0 0 #f75c4400; }
+    }
 
     .chat-bubble.loading {
       display: flex !important; justify-content: center !important; align-items: center !important;
@@ -205,6 +206,36 @@
 
   let sessionId = crypto.randomUUID();
 
+  // ====== FRONTEND-ONLY HISTORY HELPERS ======
+  function lsGet(key, fallback) { try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; } catch { return fallback; } }
+  function lsSet(key, value) { try { localStorage.setItem(key, JSON.stringify(value)); } catch(e) { console.warn('[history] lsSet error', e); } }
+  function sessionListKey(uid) { return `knu_sessions_${uid}`; }
+  function chatKey(sid) { return `knu_chat_${sid}`; }
+  function deletedSessionsKey(uid) { return `knu_deleted_sessions_${uid}`; }
+  function getDeletedSet() { return new Set(lsGet(deletedSessionsKey(userId), [])); }
+  function addDeleted(sid) {
+    const set = getDeletedSet();
+    if (!set.has(sid)) {
+      const arr = Array.from(set);
+      arr.push(sid);
+      lsSet(deletedSessionsKey(userId), arr);
+    }
+  }
+  function ensureSessionListed(uid, sid, titleText) {
+    const key = sessionListKey(uid);
+    const list = lsGet(key, []);
+    const idx = list.findIndex(x => x.sessionId === sid);
+    const title = (titleText || '').slice(0, 50) || sid.slice(0, 8);
+    if (idx >= 0) { list[idx].updatedAt = Date.now(); if (titleText) list[idx].title = title; }
+    else { list.unshift({ sessionId: sid, title, createdAt: Date.now(), updatedAt: Date.now() }); }
+    lsSet(key, list.slice(0, 20));
+  }
+  function appendToChatStore(sid, role, text) {
+    const key = chatKey(sid);
+    const arr = lsGet(key, []);
+    arr.push({ role, text, ts: Date.now() });
+    lsSet(key, arr);
+  }
   let controller = null;
   let loadingMessage = null;
   let loadingTimer = null;
@@ -254,7 +285,7 @@
 
   function preserveWhitespace(text) {
     text = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-    text = text.replace(/((https?:\/\/|www\.)[^\s<>(){}\[\]'"]+[\w/#?&=~%@-])/g, function(url) {
+    text = text.replace(/((https?:\/\/|www\.)[^\s<>(){}\[\]'\"]+[\w/#?&=~%@-])/g, function(url) {
       let href = url; if (url.startsWith("www.")) { href = "http://" + url; }
       return `<a href="${href}" target="_blank" rel="noopener noreferrer">${url}</a>`;
     });
@@ -354,6 +385,8 @@
     `;
     chatBox.appendChild(msg);
     scrollToBottom();
+    appendToChatStore(sessionId, 'user', text);
+    ensureSessionListed(userId, sessionId, text);
     return msgId;
   }
 
@@ -383,6 +416,8 @@
     `;
     chatBox.appendChild(msg);
     scrollToBottom();
+    appendToChatStore(sessionId, 'bot', text);
+    ensureSessionListed(userId, sessionId, (originalQuestion || text));
     return msgId;
   }
 
@@ -439,7 +474,6 @@
       appendBotMessage("이 세션에는 표시할 대화가 없어요. 새로 질문해 주세요.");
       return;
     }
-    // 서버에서 오래된 순으로 주더라도 그대로 시간순으로 쌓이도록 처리
     historyArray.forEach(item => {
       const q = (item.question ?? "").toString();
       const a = (item.answer ?? "").toString();
@@ -454,10 +488,56 @@
       if (!res.ok) throw new Error();
       const data = await res.json();
       renderHistory(data.history || []);
-    } catch {
-      // 백엔드에 /history/{session_id}가 아직 없다면 폴백
-      initChat();
-      appendBotMessage("이전 대화로 전환했어요. 계속 질문해 주세요.");
+    } catch (e) {
+      // FRONTEND-ONLY FALLBACK
+      const sid = targetSessionId || sessionId;
+      const arr = lsGet(chatKey(sid), []);
+      clearChatExceptIntro();
+      if (!arr.length) {
+        appendBotMessage("이 세션에는 표시할 대화가 없어요. 새로 질문해 주세요.");
+        return;
+      }
+      arr.forEach(item => {
+        if (item.role === 'user') appendUserMessage(item.text);
+        else appendBotMessage(item.text);
+      });
+    }
+  }
+
+  // ====== 세션 삭제 ======
+  function deleteSession(targetSessionId) {
+    try {
+      // 로컬스토리지에서 세션 메타/대화 삭제
+      const list = lsGet(sessionListKey(userId), []).filter(s => s.sessionId !== targetSessionId);
+      lsSet(sessionListKey(userId), list);
+      localStorage.removeItem(chatKey(targetSessionId));
+
+      // UI 즉시 반영: 세션 리스트에서 해당 행 제거
+      const items = document.getElementById('session-items');
+      if (items) {
+        Array.from(items.children).forEach(row => {
+          const btn = row.querySelector('button');
+          if (btn && btn.title === targetSessionId) items.removeChild(row);
+        });
+      }
+
+      // 삭제 목록에 기록하여 백엔드 응답과 무관하게 화면에서 숨김
+      addDeleted(targetSessionId);
+
+      // 현재 보고 있던 세션을 지웠다면 새 세션 시작
+      if (sessionId === targetSessionId) {
+        sessionId = crypto.randomUUID();
+        initChat();
+        updateIdBadge();
+      }
+
+      // (선택) 백엔드에도 삭제 요청 (엔드포인트 존재 시)
+      fetch(`${BACKEND_URL}/delete_session/${targetSessionId}`, { method: 'DELETE' }).catch(() => {});
+
+      // 목록 재로딩 (필터가 적용되어 이미 삭제된 항목은 표시되지 않음)
+      fetchSessions();
+    } catch (e) {
+      console.warn('세션 삭제 오류:', e);
     }
   }
 
@@ -471,7 +551,8 @@
       const items = document.getElementById('session-items');
       items.innerHTML = "";
 
-      const sessions = (data.sessions || []);
+      const delSet = getDeletedSet();
+      const sessions = (data.sessions || []).filter(s => !delSet.has(s.session_id));
       if (sessions.length === 0) {
         box.style.display = 'none';
         return;
@@ -479,20 +560,95 @@
       box.style.display = 'block';
 
       sessions.forEach(s => {
+        const row = document.createElement('div');
+        row.className = 'session-item';
+        row.style.display = 'flex';
+        row.style.justifyContent = 'space-between';
+        row.style.alignItems = 'center';
+
         const btn = document.createElement('button');
-        btn.className = 'session-item';
         btn.textContent = s.title || s.session_id;
         btn.title = s.session_id;
+        btn.style.flex = '1';
+        btn.style.border = 'none';
+        btn.style.background = 'transparent';
+        btn.style.textAlign = 'left';
+        btn.style.cursor = 'pointer';
         btn.onclick = () => {
           sessionId = s.session_id; // 이 세션으로 전환
           updateIdBadge();
-          fetchHistory(sessionId);  // ✅ 전환 즉시 히스토리 불러오기
+          fetchHistory(sessionId);  // 전환 즉시 히스토리 불러오기
         };
-        items.appendChild(btn);
+
+        const delBtn = document.createElement('button');
+        delBtn.textContent = '❌';
+        delBtn.style.border = 'none';
+        delBtn.style.background = 'transparent';
+        delBtn.style.cursor = 'pointer';
+        delBtn.style.marginLeft = '6px';
+        delBtn.title = '대화 삭제';
+        delBtn.onclick = (e) => {
+          e.stopPropagation();
+          if (confirm('이 대화를 삭제하시겠습니까?')) {
+            deleteSession(s.session_id);
+            fetchSessions();
+          }
+        };
+
+        row.appendChild(btn);
+        row.appendChild(delBtn);
+        items.appendChild(row);
       });
-    } catch {
+    } catch (e) {
+      // FRONTEND-ONLY FALLBACK
       const box = document.getElementById('session-list');
-      if (box) box.style.display = 'none';
+      const items = document.getElementById('session-items');
+      if (!box || !items) return;
+      items.innerHTML = "";
+      const localList = lsGet(sessionListKey(userId), []);
+      const delSet = getDeletedSet();
+      if (localList.length === 0) { box.style.display = 'none'; return; }
+      box.style.display = 'block';
+      localList.filter(s => !delSet.has(s.sessionId)).slice(0, 5).forEach(s => {
+        const row = document.createElement('div');
+        row.className = 'session-item';
+        row.style.display = 'flex';
+        row.style.justifyContent = 'space-between';
+        row.style.alignItems = 'center';
+
+        const btn = document.createElement('button');
+        btn.textContent = s.title || s.sessionId;
+        btn.title = s.sessionId;
+        btn.style.flex = '1';
+        btn.style.border = 'none';
+        btn.style.background = 'transparent';
+        btn.style.textAlign = 'left';
+        btn.style.cursor = 'pointer';
+        btn.onclick = () => {
+          sessionId = s.sessionId;
+          updateIdBadge();
+          fetchHistory(sessionId);
+        };
+
+        const delBtn = document.createElement('button');
+        delBtn.textContent = '❌';
+        delBtn.style.border = 'none';
+        delBtn.style.background = 'transparent';
+        delBtn.style.cursor = 'pointer';
+        delBtn.style.marginLeft = '6px';
+        delBtn.title = '대화 삭제';
+        delBtn.onclick = (e) => {
+          e.stopPropagation();
+          if (confirm('이 대화를 삭제하시겠습니까?')) {
+            deleteSession(s.sessionId);
+            fetchSessions();
+          }
+        };
+
+        row.appendChild(btn);
+        row.appendChild(delBtn);
+        items.appendChild(row);
+      });
     }
   }
 
