@@ -484,7 +484,7 @@
 
   async function fetchHistory(targetSessionId) {
     try {
-      const res = await fetch(`${BACKEND_URL}/history/${targetSessionId}`);
+      const res = await fetch(`${BACKEND_URL}/history/${targetSessionId}?user_id=${userId}`);
       if (!res.ok) throw new Error();
       const data = await res.json();
       renderHistory(data.history || []);
